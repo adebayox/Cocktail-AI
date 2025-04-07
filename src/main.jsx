@@ -13,8 +13,7 @@ import { ToastContainer } from "react-toastify";
 import "./index.css";
 import SignUp from "./pages/SignUp";
 import Login from "./pages/Login";
-import Homepage from "./pages/HomePage";
-// bug fixed
+import HomePage from "./pages/HomePage";
 
 import SharedRecipe from "./pages/SharedRecipe";
 
@@ -40,7 +39,7 @@ const router = createBrowserRouter([
   },
   {
     path: "/home",
-    element: <Homepage />,
+    element: <HomePage />,
   },
   {
     path: "/home/recipe/:recipeId",
