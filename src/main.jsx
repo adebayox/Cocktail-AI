@@ -14,6 +14,8 @@ import "./index.css";
 import SignUp from "./pages/SignUp";
 import Login from "./pages/Login";
 import Homepage from "./pages/HomePage";
+// bug fixed
+
 import SharedRecipe from "./pages/SharedRecipe";
 
 const queryClient = new QueryClient({
