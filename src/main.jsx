@@ -14,6 +14,7 @@ import "./index.css";
 import SignUp from "./pages/SignUp";
 import Login from "./pages/Login";
 import Homepage from "./pages/HomePage";
+import SharedRecipe from "./pages/SharedRecipe";
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -38,6 +39,10 @@ const router = createBrowserRouter([
   {
     path: "/home",
     element: <Homepage />,
+  },
+  {
+    path: "/home/recipe/:recipeId",
+    element: <SharedRecipe />,
   },
 ]);
 
