@@ -64,7 +64,7 @@ const SharedRecipe = () => {
         <RecipeDisplay recipe={recipe} />
         <div className="text-center mt-8">
           <Link
-            to="/signup"
+            to="/"
             className="bg-purple-600 text-white px-6 py-2 rounded-lg hover:bg-purple-700 inline-block"
           >
             Sign up to create your own recipes

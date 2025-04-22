@@ -6,6 +6,7 @@ import {
   Trash2,
   Copy,
   ExternalLink,
+  X,
 } from "lucide-react";
 import RecipeChat from "./RecipeChat";
 import RatingFeedbackForm from "../RatingFeedbackForm";
@@ -67,7 +68,7 @@ const RecipeDisplay = ({
   };
 
   return (
-    <>
+    <div className="max-h-[90vh] overflow-y-auto">
       <div className="max-w-2xl mx-auto bg-white rounded-xl shadow-lg p-8 mb-8">
         <div className="flex justify-between items-start mb-6">
           <div>
@@ -207,36 +208,52 @@ const RecipeDisplay = ({
       {/* Share Modal */}
       {showShareModal && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-          <div className="bg-white rounded-lg p-6 max-w-md w-full mx-4">
-            <h3 className="text-xl font-semibold text-purple-900 mb-4">
-              Share Recipe
-            </h3>
-            <div className="bg-gray-100 p-3 rounded-lg mb-4 flex items-center justify-between">
-              <div className="truncate mr-2">{getShareableLink()}</div>
-              <button
-                onClick={copyToClipboard}
-                className="text-purple-600 hover:text-purple-800"
-              >
-                <Copy className="w-5 h-5" />
-              </button>
+          <div className="bg-white rounded-lg overflow-hidden max-w-md w-full mx-4">
+            {/* Window control header */}
+            <div className="bg-gray-100 px-4 py-2 flex items-center justify-between border-b">
+              <h3 className="text-lg font-medium text-purple-900">
+                Share Recipe
+              </h3>
+              <div className="flex space-x-2">
+                <button
+                  className="w-3 h-3 rounded-full bg-yellow-400 hover:bg-yellow-500"
+                  aria-label="Minimize"
+                />
+                <button
+                  className="w-3 h-3 rounded-full bg-green-400 hover:bg-green-500"
+                  aria-label="Maximize"
+                />
+                <button
+                  onClick={() => setShowShareModal(false)}
+                  className="w-3 h-3 rounded-full bg-red-400 hover:bg-red-500"
+                  aria-label="Close modal"
+                />
+              </div>
             </div>
-            <div className="flex justify-between">
-              <a
-                href={`https://twitter.com/intent/tweet?text=Check%20out%20this%20amazing%20cocktail%20recipe!&url=${encodeURIComponent(
-                  getShareableLink()
-                )}`}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="text-purple-600 hover:text-purple-800 flex items-center"
-              >
-                Share on Twitter <ExternalLink className="w-4 h-4 ml-1" />
-              </a>
-              <button
-                onClick={() => setShowShareModal(false)}
-                className="text-gray-600 hover:text-gray-800"
-              >
-                Close
-              </button>
+
+            {/* Modal content */}
+            <div className="p-6">
+              <div className="bg-gray-100 p-3 rounded-lg mb-4 flex items-center justify-between">
+                <div className="truncate mr-2">{getShareableLink()}</div>
+                <button
+                  onClick={copyToClipboard}
+                  className="text-purple-600 hover:text-purple-800"
+                >
+                  <Copy className="w-5 h-5" />
+                </button>
+              </div>
+              <div className="flex justify-between">
+                <a
+                  href={`https://twitter.com/intent/tweet?text=Check%20out%20this%20amazing%20cocktail%20recipe!&url=${encodeURIComponent(
+                    getShareableLink()
+                  )}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-purple-600 hover:text-purple-800 flex items-center"
+                >
+                  Share on Twitter <ExternalLink className="w-4 h-4 ml-1" />
+                </a>
+              </div>
             </div>
           </div>
         </div>
@@ -249,7 +266,7 @@ const RecipeDisplay = ({
       <RecipeRatings recipeId={recipeId} />
 
       <RecipeChat recipe={recipe} />
-    </>
+    </div>
   );
 };
 
