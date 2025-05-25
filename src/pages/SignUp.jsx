@@ -21,6 +21,36 @@ const SignUp = () => {
   const [showPassword, setShowPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
 
+  const navigate = useNavigate();
+
+  const signUpMutation = useMutation({
+    mutationFn: (data) =>
+      publicFetch.request({
+        method: "POST",
+        url: "users",
+        data: {
+          username: data.username,
+          email: data.email,
+          password: data.password,
+        },
+      }),
+    onSuccess: (res) => {
+      // console.log(res);
+      console.log(res.data?.code);
+      if (res.data?.code == "00") {
+        navigate("/login");
+        toast.success("Signup Successful");
+      } else {
+        toast.error("Invalid username or password");
+      }
+    },
+    onError: (error) => {
+      console.log("Error callback triggered:", error);
+      toast.error("Something went wrong. Please try again.");
+      console.error(error);
+    },
+  });
+
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData((prevData) => ({
@@ -32,11 +62,7 @@ const SignUp = () => {
   const handleSubmit = (e) => {
     e.preventDefault();
     setIsLoading(true);
-    // Simulate API call
-    setTimeout(() => {
-      setIsLoading(false);
-      console.log("Signup attempted with:", formData);
-    }, 2000);
+    signUpMutation.mutate(formData);
   };
 
   return (
@@ -203,7 +229,7 @@ const SignUp = () => {
               {/* Submit Button */}
               <button
                 type="submit"
-                disabled={isLoading}
+                disabled={signUpMutation.isPending}
                 className="w-full py-3 px-6 bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 
                          text-white font-semibold rounded-xl shadow-lg
                          focus:outline-none focus:ring-2 focus:ring-purple-400/50
@@ -211,7 +237,7 @@ const SignUp = () => {
                          disabled:opacity-60 disabled:cursor-not-allowed disabled:transform-none
                          flex items-center justify-center space-x-2"
               >
-                {isLoading ? (
+                {signUpMutation.isPending ? (
                   <>
                     <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin" />
                     <span>Joining the Bar...</span>
