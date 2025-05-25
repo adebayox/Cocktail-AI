@@ -1,11 +1,13 @@
 import React from "react";
 import { X } from "lucide-react";
 
-const Overlay = ({ isOpen, onClose, children }) => {
+const Overlay = ({ isOpen, onClose, children, zIndex = "z-50" }) => {
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
+    <div
+      className={`fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 ${zIndex}`}
+    >
       <div className="bg-white rounded-xl shadow-lg p-8 max-w-2xl w-full">
         <button
           onClick={onClose}

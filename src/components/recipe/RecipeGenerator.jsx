@@ -60,9 +60,7 @@ const RecipeGenerator = ({
 
   return (
     <div className="max-w-2xl mx-auto bg-white rounded-xl shadow-lg p-8">
-      <h2 className="text-2xl font-bold text-center text-purple-900 mb-4">
-        AI Cocktail Recipe Generator
-      </h2>
+      <h2 className="text-2xl font-bold text-center text-purple-900 mb-4"></h2>
       <p className="text-center text-purple-600 mb-8">
         Enter your preferences or upload an image to craft the perfect cocktail!
       </p>

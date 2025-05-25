@@ -4,7 +4,7 @@ import { privateFetch } from "../utility/fetchFunction";
 import { toast } from "react-toastify";
 import useUserStore from "../store/useUserStore";
 
-const RatingFeedbackForm = ({ recipeId }) => {
+const RatingFeedbackForm = ({ recipeId, onRatingSubmitted }) => {
   const [rating, setRating] = useState(0);
   const [feedback, setFeedback] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -40,6 +40,11 @@ const RatingFeedbackForm = ({ recipeId }) => {
         toast.success("Rating submitted successfully!");
         setRating(0);
         setFeedback("");
+
+        // Call the callback to notify parent component
+        if (onRatingSubmitted) {
+          onRatingSubmitted();
+        }
       }
     } catch (error) {
       console.error("Rating submission error:", error);

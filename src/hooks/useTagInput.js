@@ -18,6 +18,11 @@ export const useTagInput = (initialTags = []) => {
     [tags]
   );
 
+  // Add this new clearAll function
+  const clearAll = useCallback(() => {
+    setTags([]);
+  }, []);
+
   return {
     tags,
     setTags,
@@ -25,5 +30,6 @@ export const useTagInput = (initialTags = []) => {
     setInput,
     addTag,
     removeTag,
+    clearAll, // Export the new clearAll function
   };
 };

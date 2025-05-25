@@ -18,7 +18,7 @@ const CollectionsView = ({
 
   return (
     <div className="max-w-6xl mx-auto">
-      <div className="flex justify-between items-center mb-8">
+      {/* <div className="flex justify-between items-center mb-8">
         <h2 className="text-2xl font-bold text-purple-900">Your Collections</h2>
         <button
           onClick={onCreateNew}
@@ -27,7 +27,7 @@ const CollectionsView = ({
           <Plus className="w-5 h-5 mr-1" />
           Create New Collection
         </button>
-      </div>
+      </div> */}
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         {collections?.map((collection) => (

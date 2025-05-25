@@ -19,7 +19,6 @@ import {
   Coffee,
   TrendingUp,
   Star,
-  LogOut,
 } from "lucide-react";
 import { toast } from "react-toastify";
 
@@ -101,26 +100,6 @@ const Homepage = () => {
       fetchSavedRecipes();
     }
   }, [viewMode, fetchSavedRecipes]);
-
-  useEffect(() => {
-    // Fetch saved recipes when component mounts to get accurate stats
-    fetchSavedRecipes();
-  }, []); // Run once on mount
-
-  // Also fetch when returning to generator view to keep stats updated
-  useEffect(() => {
-    if (viewMode === "generator") {
-      fetchSavedRecipes();
-    }
-  }, [viewMode, fetchSavedRecipes]);
-
-  const { logout } = useUserStore();
-
-  const handleLogout = () => {
-    logout();
-    navigate("/login");
-    toast.success("Logged out successfully");
-  };
 
   // Handlers
   const handleGenerateRecipes = async () => {
@@ -318,20 +297,18 @@ const Homepage = () => {
         {/* Enhanced Header */}
         <header className="flex justify-between items-center mb-8 md:mb-12">
           <div className="flex items-center space-x-4">
+            <div className="hidden md:block w-12 h-12 bg-gradient-to-br from-purple-600 to-pink-600 rounded-xl flex items-center justify-center shadow-lg">
+              <Sparkles className="w-6 h-6 text-white" />
+            </div>
             <div>
-              <div className="flex items-center space-x-3 mb-1">
-                <h1 className="text-lg md:text-2xl font-bold bg-gradient-to-r from-purple-700 via-pink-600 to-orange-500 bg-clip-text text-transparent animate-pulse">
-                  Hey there, {name}! 👋
-                </h1>
-              </div>
+              <h1 className="text-lg md:text-xl font-medium text-gray-700">
+                Hey {name},
+              </h1>
               <div className="flex items-center space-x-2">
                 <p className="text-xl md:text-3xl font-bold bg-gradient-to-r from-purple-800 via-pink-700 to-orange-600 bg-clip-text text-transparent">
-                  Cocktail Recipe Generator
+                  CocktailCraft AI
                 </p>
-                <div className="hidden md:flex items-center space-x-1 bg-gradient-to-r from-green-400 to-blue-500 text-white px-3 py-1 rounded-full text-xs font-semibold shadow-lg animate-pulse">
-                  <div className="w-2 h-2 bg-green-300 rounded-full animate-ping"></div>
-                  <span>AI Powered</span>
-                </div>
+                <Star className="w-5 h-5 text-yellow-500 animate-pulse" />
               </div>
             </div>
           </div>
@@ -374,46 +351,25 @@ const Homepage = () => {
             >
               ✨ Go Premium
             </button>
-            {/* Logout Button for Desktop */}
-            <button
-              onClick={handleLogout}
-              className="bg-gradient-to-r from-red-500 to-red-600 text-white px-4 py-3 rounded-xl hover:from-red-600 hover:to-red-700 transition-all duration-300 font-medium shadow-lg hover:shadow-xl transform hover:scale-105 ml-2 flex items-center space-x-2"
-              title="Logout"
-            >
-              <LogOut className="w-4 h-4" />
-              <span className="hidden lg:inline">Logout</span>
-            </button>
           </nav>
 
-          {/* Mobile Navigation Area - Added Logout button here */}
-          <div className="md:hidden flex items-center space-x-2">
-            {/* Mobile Logout Button - Always visible */}
-            {/* <button
-              onClick={handleLogout}
-              className="flex items-center justify-center bg-gradient-to-r from-red-500 to-red-600 text-white p-3 rounded-xl hover:from-red-600 hover:to-red-700 transition-all duration-300 shadow-lg"
-              aria-label="Logout"
-            >
-              <LogOut className="w-5 h-5" />
-            </button> */}
-
-            {/* Mobile Menu Button */}
-            <button
-              className="flex items-center text-purple-800 bg-white/70 backdrop-blur-md p-3 rounded-xl shadow-lg"
-              onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-            >
-              <Menu className="w-6 h-6" />
-            </button>
-          </div>
+          {/* Mobile Menu Button */}
+          <button
+            className="md:hidden flex items-center text-purple-800 bg-white/70 backdrop-blur-md p-3 rounded-xl shadow-lg"
+            onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+          >
+            <Menu className="w-6 h-6" />
+          </button>
         </header>
 
         {/* Stats Dashboard - Only show on generator view for desktop */}
         {viewMode === "generator" && (
-          <div className="hidden md:block fixed right-6 top-32 w-80 z-30">
-            <div className="space-y-4">
+          <div className="hidden md:block mb-12">
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-6xl mx-auto">
               {statsCards.map((stat, index) => (
                 <div
                   key={stat.title}
-                  className={`${stat.bgPattern} backdrop-blur-sm rounded-2xl p-6 shadow-lg border border-white/20 hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1 hover:scale-105`}
+                  className={`${stat.bgPattern} backdrop-blur-sm rounded-2xl p-6 shadow-lg border border-white/20 hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1`}
                   style={{ animationDelay: `${index * 0.1}s` }}
                 >
                   <div className="flex items-center justify-between mb-4">
@@ -437,78 +393,47 @@ const Homepage = () => {
           </div>
         )}
 
-        {/* Mobile Navigation Menu */}
+        {/* Mobile Navigation */}
         {mobileMenuOpen && (
           <div className="md:hidden fixed top-0 right-0 h-full w-80 bg-white/95 backdrop-blur-xl shadow-2xl z-50 transform transition-transform duration-300 ease-in-out border-l border-white/20">
             <div className="p-6 border-b border-gray-200/50 flex justify-between items-center bg-gradient-to-r from-purple-600 to-pink-600">
               <h3 className="font-bold text-white text-lg">Menu</h3>
-              <div className="flex items-center space-x-2">
-                {/* Add Logout Button in header for visibility */}
-                <button
-                  onClick={() => {
-                    handleLogout();
-                    setMobileMenuOpen(false);
-                  }}
-                  className="text-white hover:bg-white/20 p-2 rounded-lg flex items-center space-x-1"
-                  aria-label="Logout"
-                >
-                  <LogOut className="w-5 h-5" />
-                  <span className="text-sm">Logout</span>
-                </button>
-                <button
-                  onClick={() => setMobileMenuOpen(false)}
-                  className="text-white hover:bg-white/20 p-2 rounded-lg"
-                >
-                  <X className="w-5 h-5" />
-                </button>
-              </div>
+              <button
+                onClick={() => setMobileMenuOpen(false)}
+                className="text-white hover:bg-white/20 p-2 rounded-lg"
+              >
+                <X className="w-5 h-5" />
+              </button>
             </div>
-            <div className="flex flex-col h-full">
-              {/* Main Navigation */}
-              <div className="flex-1 p-6 space-y-4">
-                {[
-                  { key: "generator", label: "Generate", icon: Sparkles },
-                  { key: "collections", label: "Collections", icon: Coffee },
-                  { key: "saved", label: "Saved", icon: Star },
-                ].map((item) => (
-                  <button
-                    key={item.key}
-                    onClick={() => handleNavigation(item.key)}
-                    className={`flex items-center space-x-3 py-4 px-6 text-left rounded-xl transition-all duration-300 w-full ${
-                      viewMode === item.key
-                        ? "bg-gradient-to-r from-purple-600 to-pink-600 text-white shadow-lg"
-                        : "text-gray-700 hover:bg-purple-100/50"
-                    }`}
-                  >
-                    <item.icon className="w-5 h-5" />
-                    <span className="font-medium">{item.label}</span>
-                  </button>
-                ))}
+            <div className="flex flex-col p-6 space-y-4">
+              {[
+                { key: "generator", label: "Generate", icon: Sparkles },
+                { key: "collections", label: "Collections", icon: Coffee },
+                { key: "saved", label: "Saved", icon: Star },
+              ].map((item) => (
                 <button
-                  onClick={() => {
-                    setShowPremiumModal(true);
-                    setMobileMenuOpen(false);
-                  }}
-                  className="mt-6 bg-gradient-to-r from-orange-500 to-yellow-500 text-white py-4 px-6 rounded-xl hover:from-orange-600 hover:to-yellow-600 text-center font-semibold shadow-lg flex items-center justify-center space-x-2 w-full"
+                  key={item.key}
+                  onClick={() => handleNavigation(item.key)}
+                  className={`flex items-center space-x-3 py-4 px-6 text-left rounded-xl transition-all duration-300 ${
+                    viewMode === item.key
+                      ? "bg-gradient-to-r from-purple-600 to-pink-600 text-white shadow-lg"
+                      : "text-gray-700 hover:bg-purple-100/50"
+                  }`}
                 >
-                  <Sparkles className="w-5 h-5" />
-                  <span>Go Premium</span>
+                  <item.icon className="w-5 h-5" />
+                  <span className="font-medium">{item.label}</span>
                 </button>
-              </div>
-
-              {/* Bottom logout button (keep this for accessibility) */}
-              <div className="p-6 border-t border-gray-200/50 mt-auto">
-                <button
-                  onClick={() => {
-                    handleLogout();
-                    setMobileMenuOpen(false);
-                  }}
-                  className="w-full bg-gradient-to-r from-red-500 to-red-600 text-white py-4 px-6 rounded-xl hover:from-red-600 hover:to-red-700 transition-all duration-300 font-semibold shadow-lg flex items-center justify-center space-x-2"
-                >
-                  <LogOut className="w-5 h-5" />
-                  <span>Logout</span>
-                </button>
-              </div>
+              ))}
+              <button
+                onClick={() => {
+                  setShowPremiumModal(true);
+                  setMobileMenuOpen(false);
+                }}
+                className="mt-6 bg-gradient-to-r from-orange-500 to-yellow-500 text-white py-4 px-6 rounded-xl hover:from-orange-600 hover:to-yellow-600 text-center font-semibold shadow-lg flex items-center justify-center space-x-2"
+              >
+                <Sparkles className="w-5 h-5" />
+                <span>Go Premium</span>
+              </button>
             </div>
           </div>
         )}
@@ -518,9 +443,9 @@ const Homepage = () => {
         )}
 
         {/* Main Content */}
-        <main className="container mx-auto px-0 md:px-4 md:pr-96">
+        <main className="container mx-auto px-0 md:px-4">
           {viewMode === "generator" && (
-            <div className="max-w-4xl mx-auto">
+            <div className="max-w-6xl mx-auto">
               <RecipeGenerator
                 ingredients={ingredients}
                 flavors={flavors}

@@ -85,17 +85,19 @@ const RecipeChat = ({ recipe }) => {
   };
 
   return (
-    <div className="fixed bottom-4 right-4 z-50 w-full max-w-md">
-      <div className="bg-white rounded-t-xl shadow-lg">
+    <div className="fixed bottom-2 sm:bottom-4 left-2 right-2 sm:left-auto sm:right-4 z-50 w-auto sm:w-full sm:max-w-md">
+      <div className="bg-white rounded-t-xl shadow-lg border border-gray-200">
         <button
           onClick={toggleChat}
-          className="w-full flex items-center justify-between p-4 bg-purple-600 text-white rounded-t-xl"
+          className="w-full flex items-center justify-between p-3 sm:p-4 bg-purple-600 text-white rounded-t-xl hover:bg-purple-700 transition-colors"
         >
-          <span className="font-medium">Ask about this recipe</span>
+          <span className="font-medium text-sm sm:text-base">
+            Ask about this recipe
+          </span>
           {isExpanded ? (
-            <ChevronDown className="w-5 h-5" />
+            <ChevronDown className="w-4 h-4 sm:w-5 sm:h-5" />
           ) : (
-            <ChevronUp className="w-5 h-5" />
+            <ChevronUp className="w-4 h-4 sm:w-5 sm:h-5" />
           )}
         </button>
 
@@ -103,13 +105,19 @@ const RecipeChat = ({ recipe }) => {
           <>
             <div
               ref={chatContainerRef}
-              className="p-4 h-64 overflow-y-auto flex flex-col space-y-3"
+              className="p-3 sm:p-4 h-48 sm:h-64 md:h-72 overflow-y-auto flex flex-col space-y-2 sm:space-y-3"
+              style={{
+                scrollbarWidth: "none" /* Firefox */,
+                msOverflowStyle: "none" /* Internet Explorer 10+ */,
+              }}
             >
               {messages.length === 0 ? (
-                <div className="text-center text-gray-500 my-auto">
-                  <p>Ask any questions about this cocktail recipe!</p>
-                  <p className="text-sm mt-2">Examples:</p>
-                  <ul className="text-sm text-purple-600">
+                <div className="text-center text-gray-500 my-auto px-2">
+                  <p className="text-sm sm:text-base">
+                    Ask any questions about this cocktail recipe!
+                  </p>
+                  <p className="text-xs sm:text-sm mt-2">Examples:</p>
+                  <ul className="text-xs sm:text-sm text-purple-600 space-y-1">
                     <li>"What can I substitute for lime juice?"</li>
                     <li>"Why is the health rating {recipe.healthRating}?"</li>
                     <li>"How can I make this less sweet?"</li>
@@ -119,10 +127,10 @@ const RecipeChat = ({ recipe }) => {
                 messages.map((message) => (
                   <div
                     key={message.id}
-                    className={`max-w-3/4 p-3 rounded-lg ${
+                    className={`max-w-xs sm:max-w-sm p-2 sm:p-3 rounded-lg text-sm sm:text-base leading-relaxed ${
                       message.role === "user"
-                        ? "bg-purple-100 ml-auto"
-                        : "bg-gray-100 mr-auto"
+                        ? "bg-purple-100 text-purple-900 ml-auto"
+                        : "bg-gray-100 text-gray-900 mr-auto"
                     }`}
                   >
                     {message.content}
@@ -130,21 +138,24 @@ const RecipeChat = ({ recipe }) => {
                 ))
               )}
               {isLoading && (
-                <div className="bg-gray-100 p-3 rounded-lg mr-auto flex items-center space-x-2">
-                  <div className="w-2 h-2 bg-purple-600 rounded-full animate-bounce"></div>
+                <div className="bg-gray-100 p-2 sm:p-3 rounded-lg mr-auto flex items-center space-x-2">
+                  <div className="w-1.5 h-1.5 sm:w-2 sm:h-2 bg-purple-600 rounded-full animate-bounce"></div>
                   <div
-                    className="w-2 h-2 bg-purple-600 rounded-full animate-bounce"
+                    className="w-1.5 h-1.5 sm:w-2 sm:h-2 bg-purple-600 rounded-full animate-bounce"
                     style={{ animationDelay: "0.2s" }}
                   ></div>
                   <div
-                    className="w-2 h-2 bg-purple-600 rounded-full animate-bounce"
+                    className="w-1.5 h-1.5 sm:w-2 sm:h-2 bg-purple-600 rounded-full animate-bounce"
                     style={{ animationDelay: "0.4s" }}
                   ></div>
                 </div>
               )}
             </div>
 
-            <form onSubmit={handleSubmit} className="p-4 border-t">
+            <form
+              onSubmit={handleSubmit}
+              className="p-3 sm:p-4 border-t border-gray-200"
+            >
               <div className="flex items-center space-x-2">
                 <input
                   ref={inputRef}
@@ -152,15 +163,16 @@ const RecipeChat = ({ recipe }) => {
                   value={inputValue}
                   onChange={(e) => setInputValue(e.target.value)}
                   placeholder="Ask about this recipe..."
-                  className="flex-1 p-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500"
+                  className="flex-1 p-2 sm:p-2.5 text-sm sm:text-base border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent"
                   disabled={isLoading}
                 />
                 <button
                   type="submit"
-                  className="p-2 bg-purple-600 text-white rounded-md hover:bg-purple-700 disabled:bg-purple-300"
+                  className="p-2 sm:p-2.5 bg-purple-600 text-white rounded-md hover:bg-purple-700 disabled:bg-purple-300 disabled:cursor-not-allowed transition-colors flex-shrink-0"
                   disabled={!inputValue.trim() || isLoading}
+                  aria-label="Send message"
                 >
-                  <Send className="w-5 h-5" />
+                  <Send className="w-4 h-4 sm:w-5 sm:h-5" />
                 </button>
               </div>
             </form>
