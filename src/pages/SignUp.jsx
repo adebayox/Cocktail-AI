@@ -11,6 +11,12 @@ import {
   ChefHat,
   Star,
 } from "lucide-react";
+import { useNavigate } from "react-router-dom";
+import { publicFetch } from "../utility/fetchFunction";
+import { useMutation } from "@tanstack/react-query";
+import { toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
+import Button from "../components/ui/Button";
 
 const SignUp = () => {
   const [formData, setFormData] = useState({
