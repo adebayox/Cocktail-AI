@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { Star } from "lucide-react";
-import { privateFetch } from "../utility/fetchFunction"; // Your fetch utility
+import { privateFetch } from "../utility/fetchFunction"; 
 
 const RecipeRatings = ({ recipeId }) => {
   const [ratings, setRatings] = useState([]);
@@ -14,13 +14,13 @@ const RecipeRatings = ({ recipeId }) => {
           url: `cocktail/ratings/${recipeId}`,
         });
 
-        console.log("Backend response:", response.data); // Debug log
+        console.log("Backend response:", response.data); 
 
         if (response.data && Array.isArray(response.data.ratings)) {
-          setRatings(response.data.ratings); // Ensure `ratings` is an array
+          setRatings(response.data.ratings); 
         } else {
           console.error("Invalid ratings data:", response.data);
-          setRatings([]); // Fallback to an empty array
+          setRatings([]); 
         }
       } catch (error) {
         console.error("Failed to fetch ratings:", error);

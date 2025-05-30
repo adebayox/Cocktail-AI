@@ -28,7 +28,7 @@ const Homepage = () => {
   const name = useUserStore.getState().user?.username;
 
   // View state
-  const [viewMode, setViewMode] = useState("generator"); // generator, collections, saved, recipe
+  const [viewMode, setViewMode] = useState("generator");
   const [showProfile, setShowProfile] = useState(false);
   const [showCollectionModal, setShowCollectionModal] = useState(false);
   const [showNewCollectionModal, setShowNewCollectionModal] = useState(false);
@@ -53,7 +53,7 @@ const Homepage = () => {
     setInput: setIngredientInput,
     addTag: handleAddIngredient,
     removeTag: handleRemoveIngredient,
-    clearAll: clearAllIngredients, // Add this
+    clearAll: clearAllIngredients,
   } = useTagInput();
 
   const {
@@ -62,7 +62,7 @@ const Homepage = () => {
     setInput: setFlavorInput,
     addTag: handleAddFlavor,
     removeTag: handleRemoveFlavor,
-    clearAll: clearAllFlavors, // Add this
+    clearAll: clearAllFlavors,
   } = useTagInput();
 
   const {
@@ -71,7 +71,7 @@ const Homepage = () => {
     setInput: setDietaryInput,
     addTag: handleAddDietaryNeed,
     removeTag: handleRemoveDietaryNeed,
-    clearAll: clearAllDietaryNeeds, // Add this
+    clearAll: clearAllDietaryNeeds,
   } = useTagInput();
 
   const {
@@ -143,7 +143,7 @@ const Homepage = () => {
         dietaryNeeds,
       });
 
-      console.log("Generated recipe:", recipe); // Debug log
+      console.log("Generated recipe:", recipe);
 
       if (recipe) {
         setGeneratedRecipe(recipe);
@@ -191,7 +191,7 @@ const Homepage = () => {
     }
 
     saveToCollection({
-      cocktailId: selectedCocktail, // This can be either an ID string or a full cocktail object
+      cocktailId: selectedCocktail,
       collection,
     });
     setShowCollectionModal(false);
@@ -205,8 +205,8 @@ const Homepage = () => {
   // Handle image analysis results
   const handleImageAnalysis = (analysis, imageUrl) => {
     console.log("Received analysis in Homepage:", analysis);
-    console.log("Uploaded Image URL in Homepage:", imageUrl); // Debug log
-    setUploadedImageUrl(imageUrl); // Set the uploaded image URL
+    console.log("Uploaded Image URL in Homepage:", imageUrl);
+    setUploadedImageUrl(imageUrl);
     setImageAnalysis(analysis);
 
     if (analysis && analysis.cocktailName) {
@@ -216,7 +216,7 @@ const Homepage = () => {
         ingredients: analysis.ingredients || [],
         instructions: ["Mix all ingredients", "Serve with appropriate garnish"],
         tags: ["AI Identified"],
-        imageUrl: imageUrl, // Use the uploaded image URL directly
+        imageUrl: imageUrl,
       };
 
       setGeneratedRecipe(basicRecipe);
@@ -229,8 +229,6 @@ const Homepage = () => {
   const handleSwitchToGenerator = () => {
     setViewMode("generator");
     setMobileMenuOpen(false);
-    // Optional: clear image analysis when returning to generator
-    // setImageAnalysis(null);
   };
 
   // Handle navigation with mobile menu
@@ -315,7 +313,7 @@ const Homepage = () => {
       </div>
 
       <div className="relative z-10 p-4 md:p-6">
-        {/* Enhanced Header */}
+        {/*  Header */}
         <header className="flex justify-between items-center mb-8 md:mb-12">
           <div className="flex items-center space-x-4">
             <div>
@@ -387,16 +385,6 @@ const Homepage = () => {
 
           {/* Mobile Navigation Area - Added Logout button here */}
           <div className="md:hidden flex items-center space-x-2">
-            {/* Mobile Logout Button - Always visible */}
-            {/* <button
-              onClick={handleLogout}
-              className="flex items-center justify-center bg-gradient-to-r from-red-500 to-red-600 text-white p-3 rounded-xl hover:from-red-600 hover:to-red-700 transition-all duration-300 shadow-lg"
-              aria-label="Logout"
-            >
-              <LogOut className="w-5 h-5" />
-            </button> */}
-
-            {/* Mobile Menu Button */}
             <button
               className="flex items-center text-purple-800 bg-white/70 backdrop-blur-md p-3 rounded-xl shadow-lg"
               onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
@@ -406,7 +394,7 @@ const Homepage = () => {
           </div>
         </header>
 
-        {/* Stats Dashboard - Only show on generator view for desktop */}
+        {/* Stats Dashboard desktop */}
         {viewMode === "generator" && (
           <div className="hidden md:block fixed right-6 top-32 w-80 z-30">
             <div className="space-y-4">
@@ -443,7 +431,7 @@ const Homepage = () => {
             <div className="p-6 border-b border-gray-200/50 flex justify-between items-center bg-gradient-to-r from-purple-600 to-pink-600">
               <h3 className="font-bold text-white text-lg">Menu</h3>
               <div className="flex items-center space-x-2">
-                {/* Add Logout Button in header for visibility */}
+                {/* Logout Button in header */}
                 <button
                   onClick={() => {
                     handleLogout();
@@ -464,7 +452,7 @@ const Homepage = () => {
               </div>
             </div>
             <div className="flex flex-col h-full">
-              {/* Main Navigation */}
+              {/* Main Nav */}
               <div className="flex-1 p-6 space-y-4">
                 {[
                   { key: "generator", label: "Generate", icon: Sparkles },
@@ -496,7 +484,6 @@ const Homepage = () => {
                 </button>
               </div>
 
-              {/* Bottom logout button (keep this for accessibility) */}
               <div className="p-6 border-t border-gray-200/50 mt-auto">
                 <button
                   onClick={() => {

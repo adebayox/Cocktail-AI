@@ -10,7 +10,6 @@ const RecipeChat = ({ recipe }) => {
   const chatContainerRef = useRef(null);
   const inputRef = useRef(null);
 
-  // Scroll to the bottom of the chat when new messages are added
   useEffect(() => {
     if (chatContainerRef.current && isExpanded) {
       chatContainerRef.current.scrollTop =
@@ -18,7 +17,6 @@ const RecipeChat = ({ recipe }) => {
     }
   }, [messages, isExpanded]);
 
-  // Focus input when chat is expanded
   useEffect(() => {
     if (isExpanded && inputRef.current) {
       inputRef.current.focus();
@@ -35,13 +33,11 @@ const RecipeChat = ({ recipe }) => {
       content: inputValue,
     };
 
-    // Add user message to the chat
     setMessages((prev) => [...prev, userMessage]);
     setInputValue("");
     setIsLoading(true);
 
     try {
-      // Call your API with the message and current recipe information
       const response = await privateFetch.request({
         method: "POST",
         url: "cocktail/chat",
@@ -58,7 +54,6 @@ const RecipeChat = ({ recipe }) => {
           content: response.data.message,
         };
 
-        // Add assistant response to chat
         setMessages((prev) => [...prev, assistantMessage]);
       } else {
         throw new Error(response?.data?.message || "Failed to get response");
@@ -107,8 +102,8 @@ const RecipeChat = ({ recipe }) => {
               ref={chatContainerRef}
               className="p-3 sm:p-4 h-48 sm:h-64 md:h-72 overflow-y-auto flex flex-col space-y-2 sm:space-y-3"
               style={{
-                scrollbarWidth: "none" /* Firefox */,
-                msOverflowStyle: "none" /* Internet Explorer 10+ */,
+                scrollbarWidth: "none",
+                msOverflowStyle: "none",
               }}
             >
               {messages.length === 0 ? (

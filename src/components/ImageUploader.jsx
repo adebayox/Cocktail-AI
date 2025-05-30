@@ -16,9 +16,9 @@ const ImageUploader = ({ onAnalysisComplete, isAnalyzing, setIsAnalyzing }) => {
       const reader = new FileReader();
       reader.onload = (event) => {
         const previewUrl = event.target.result;
-        console.log("Preview URL:", previewUrl); // Debug log
+        console.log("Preview URL:", previewUrl);
         setPreviewUrl(previewUrl);
-        analyzeImage(previewUrl); // Pass the preview URL to analyzeImage
+        analyzeImage(previewUrl);
       };
       reader.readAsDataURL(file);
     }
@@ -27,19 +27,19 @@ const ImageUploader = ({ onAnalysisComplete, isAnalyzing, setIsAnalyzing }) => {
   const analyzeImage = async (imageData) => {
     try {
       setIsAnalyzing(true);
-  
+
       const response = await privateFetch.request({
         method: "POST",
         url: "cocktail/analyze-image",
         data: { imageData },
       });
-  
+
       if (response?.data?.code === "00") {
         const analysisData = response.data.analysis;
         console.log("Analysis data with image:", analysisData);
-  
+
         // Pass both the analysis data and the preview URL
-        onAnalysisComplete(analysisData, imageData); // Pass imageData (previewUrl) here
+        onAnalysisComplete(analysisData, imageData);
       } else {
         throw new Error(response?.data?.message || "Failed to analyze image");
       }

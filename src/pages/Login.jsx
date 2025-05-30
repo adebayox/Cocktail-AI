@@ -75,9 +75,7 @@ const Login = () => {
 
   return (
     <div className="min-h-screen relative overflow-hidden bg-gradient-to-br from-purple-950 via-indigo-950 to-purple-900">
-      {/* Animated Background Elements */}
       <div className="absolute inset-0 w-full h-full">
-        {/* Large gradient orbs matching homepage theme */}
         <div className="absolute top-10 left-10 w-96 h-96 bg-gradient-to-r from-purple-500/30 to-indigo-500/30 rounded-full mix-blend-multiply filter blur-3xl opacity-70 animate-pulse"></div>
         <div
           className="absolute top-20 right-20 w-80 h-80 bg-gradient-to-r from-pink-500/25 to-purple-500/25 rounded-full mix-blend-multiply filter blur-3xl opacity-60 animate-pulse"
@@ -119,7 +117,7 @@ const Login = () => {
         ))}
       </div>
 
-      {/* Decorative Cocktail Glass SVGs */}
+      {/* Cocktail Glass SVGs */}
       <div className="absolute top-20 left-20 opacity-10">
         <svg
           width="120"
@@ -177,11 +175,9 @@ const Login = () => {
 
       <div className="relative z-10 min-h-screen flex items-center justify-center p-4">
         <div className="w-full max-w-md">
-          {/* Premium Glass Card with Purple Theme */}
           <div className="relative backdrop-blur-2xl bg-gradient-to-br from-white/10 to-white/5 border border-white/20 rounded-3xl p-8 shadow-2xl">
-            {/* Header Section */}
+            {/* Head*/}
             <div className="text-center mb-8">
-              {/* AI Cocktail Logo */}
               <div className="relative inline-flex items-center justify-center w-20 h-20 mb-6">
                 <div className="absolute inset-0 bg-gradient-to-r from-purple-500 via-indigo-500 to-pink-500 rounded-2xl shadow-xl animate-pulse"></div>
                 <div className="relative bg-gradient-to-r from-purple-600 to-indigo-600 rounded-2xl p-4 shadow-inner">
@@ -190,7 +186,7 @@ const Login = () => {
                     <Wine className="w-6 h-6 text-white" />
                   </div>
                 </div>
-                {/* Sparkling effect */}
+
                 <div className="absolute -top-1 -right-1 w-3 h-3 bg-pink-400 rounded-full animate-ping"></div>
                 <div
                   className="absolute -bottom-1 -left-1 w-2 h-2 bg-purple-400 rounded-full animate-ping"
@@ -199,18 +195,17 @@ const Login = () => {
               </div>
 
               <h1 className="text-4xl font-bold mb-2 bg-gradient-to-r from-purple-300 via-indigo-300 to-pink-300 bg-clip-text text-transparent">
-                CocktailCraft AI
+                Cocktail Recipe Generator
               </h1>
               <p className="text-purple-200 text-lg font-medium mb-1">
-                Welcome Back, Mixologist!
+                Welcome Back!
               </p>
               <p className="text-purple-300/80 text-sm">
-                Sign in to craft amazing cocktails with AI
+                Sign in to craft amazing cocktails
               </p>
             </div>
 
             <form onSubmit={handleSubmit} className="space-y-6">
-              {/* Username Field */}
               <div className="group">
                 <label className="block text-sm font-semibold text-purple-200 mb-3">
                   Username
@@ -235,7 +230,6 @@ const Login = () => {
                 </div>
               </div>
 
-              {/* Password Field */}
               <div className="group">
                 <label className="block text-sm font-semibold text-purple-200 mb-3">
                   Password
@@ -271,7 +265,6 @@ const Login = () => {
                 </div>
               </div>
 
-              {/* Premium Submit Button */}
               <button
                 type="submit"
                 disabled={loginMutation.isPending}
@@ -299,12 +292,10 @@ const Login = () => {
                   )}
                 </div>
 
-                {/* Button shimmer effect */}
                 <div className="absolute inset-0 -top-full group-hover:top-full bg-gradient-to-b from-transparent via-white/20 to-transparent transition-all duration-1000 ease-out"></div>
               </button>
             </form>
 
-            {/* Footer with Purple Theme */}
             <div className="mt-8 text-center">
               <p className="text-purple-300/80 text-sm mb-4">
                 New to cocktail crafting?{" "}
@@ -316,7 +307,6 @@ const Login = () => {
                 </a>
               </p>
 
-              {/* Premium badges */}
               <div className="flex justify-center space-x-4 text-xs text-purple-400/60">
                 <span className="flex items-center space-x-1">
                   <Zap className="w-3 h-3" />
@@ -335,7 +325,6 @@ const Login = () => {
               </div>
             </div>
 
-            {/* Decorative Elements */}
             <div className="absolute top-6 right-6 w-3 h-3 bg-gradient-to-r from-pink-400 to-purple-400 rounded-full animate-ping"></div>
             <div
               className="absolute bottom-6 left-6 w-2 h-2 bg-gradient-to-r from-indigo-400 to-purple-400 rounded-full animate-ping"
@@ -346,11 +335,9 @@ const Login = () => {
               style={{ animationDelay: "2.5s" }}
             ></div>
 
-            {/* Glass reflection effect */}
             <div className="absolute inset-0 rounded-3xl bg-gradient-to-tr from-white/10 via-transparent to-transparent pointer-events-none"></div>
           </div>
 
-          {/* Bottom Tagline */}
           <div className="text-center mt-6">
             <p className="text-purple-400/60 text-sm font-medium">
               "Where AI meets the art of mixology" 🍹✨
@@ -359,7 +346,6 @@ const Login = () => {
         </div>
       </div>
 
-      {/* Additional floating elements for extra visual appeal */}
       <div className="absolute top-1/4 left-1/4 w-1 h-1 bg-purple-400 rounded-full animate-ping opacity-60"></div>
       <div
         className="absolute top-3/4 right-1/4 w-2 h-2 bg-indigo-400 rounded-full animate-pulse opacity-40"

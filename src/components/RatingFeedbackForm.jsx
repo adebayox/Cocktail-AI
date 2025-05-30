@@ -9,7 +9,6 @@ const RatingFeedbackForm = ({ recipeId, onRatingSubmitted }) => {
   const [feedback, setFeedback] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  // Get the current user's ID from the store
   const userId = useUserStore((state) => state.user?.id);
 
   const handleSubmit = async (e) => {

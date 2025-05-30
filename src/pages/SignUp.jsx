@@ -73,9 +73,7 @@ const SignUp = () => {
 
   return (
     <div className="min-h-screen relative overflow-hidden bg-gradient-to-br from-purple-900 via-purple-800 to-indigo-900">
-      {/* Animated Background Bubbles */}
       <div className="absolute inset-0 w-full h-full">
-        {/* Large gradient bubbles */}
         <div className="absolute top-10 left-10 w-96 h-96 bg-gradient-to-r from-purple-400 to-pink-400 rounded-full mix-blend-multiply filter blur-3xl opacity-20 animate-pulse"></div>
         <div
           className="absolute top-20 right-20 w-80 h-80 bg-gradient-to-r from-blue-400 to-purple-500 rounded-full mix-blend-multiply filter blur-3xl opacity-15 animate-pulse"
@@ -91,7 +89,7 @@ const SignUp = () => {
         ></div>
       </div>
 
-      {/* Floating Cocktail Elements */}
+      {/* Cocktail Elements */}
       <div className="absolute inset-0 pointer-events-none">
         {[...Array(12)].map((_, i) => (
           <div
@@ -119,11 +117,8 @@ const SignUp = () => {
 
       <div className="relative z-10 min-h-screen flex items-center justify-center p-4">
         <div className="w-full max-w-md">
-          {/* Main Card */}
           <div className="relative backdrop-blur-xl bg-white/10 border border-white/20 rounded-3xl p-8 shadow-2xl">
-            {/* Header with Logo */}
             <div className="text-center mb-8">
-              {/* Logo */}
               <div className="relative inline-flex items-center justify-center w-16 h-16 mb-6">
                 <div className="absolute inset-0 bg-gradient-to-r from-purple-500 to-pink-500 rounded-2xl shadow-lg"></div>
                 <div className="relative bg-gradient-to-r from-purple-600 to-pink-600 rounded-2xl p-3 shadow-inner">
@@ -132,7 +127,7 @@ const SignUp = () => {
                     <ChefHat className="w-5 h-5 text-white" />
                   </div>
                 </div>
-                {/* Sparkling effects */}
+
                 <div className="absolute -top-1 -right-1 w-2 h-2 bg-pink-400 rounded-full animate-ping"></div>
                 <div
                   className="absolute -bottom-1 -left-1 w-1.5 h-1.5 bg-purple-400 rounded-full animate-ping"
@@ -141,10 +136,10 @@ const SignUp = () => {
               </div>
 
               <h1 className="text-3xl font-bold mb-2 bg-gradient-to-r from-white to-purple-200 bg-clip-text text-transparent">
-                CocktailCraft AI
+                Cocktail Recipe Generator
               </h1>
               <p className="text-purple-200 text-base font-medium mb-1">
-                Join the Bar, Mixologist!
+                Join the Bar!
               </p>
               <p className="text-purple-300/80 text-sm">
                 Create your account to craft amazing cocktails with AI
@@ -152,7 +147,6 @@ const SignUp = () => {
             </div>
 
             <form onSubmit={handleSubmit} className="space-y-6">
-              {/* Username Field */}
               <div>
                 <label className="block text-sm font-medium text-purple-200 mb-2">
                   Username
@@ -175,7 +169,6 @@ const SignUp = () => {
                 </div>
               </div>
 
-              {/* Email Field */}
               <div>
                 <label className="block text-sm font-medium text-purple-200 mb-2">
                   Email
@@ -198,7 +191,6 @@ const SignUp = () => {
                 </div>
               </div>
 
-              {/* Password Field */}
               <div>
                 <label className="block text-sm font-medium text-purple-200 mb-2">
                   Password
@@ -232,7 +224,6 @@ const SignUp = () => {
                 </div>
               </div>
 
-              {/* Submit Button */}
               <button
                 type="submit"
                 disabled={signUpMutation.isPending}
@@ -258,7 +249,6 @@ const SignUp = () => {
               </button>
             </form>
 
-            {/* Footer */}
             <div className="mt-8 text-center">
               <p className="text-purple-300/80 text-sm">
                 Already a master mixologist?{" "}
@@ -271,7 +261,6 @@ const SignUp = () => {
               </p>
             </div>
 
-            {/* Premium Features */}
             <div className="mt-6 bg-white/5 rounded-2xl p-4 border border-white/10">
               <p className="text-purple-200 text-sm font-medium mb-3 text-center">
                 ✨ What you'll get as a member:
@@ -287,16 +276,14 @@ const SignUp = () => {
                 </span>
                 <span className="flex items-center space-x-1">
                   <Star className="w-3 h-3" />
-                  <span>Craft Perfect</span>
+                  <span>Easy to Use</span>
                 </span>
               </div>
             </div>
 
-            {/* Glass reflection effect */}
             <div className="absolute inset-0 rounded-3xl bg-gradient-to-tr from-white/10 via-transparent to-transparent pointer-events-none"></div>
           </div>
 
-          {/* Bottom Tagline */}
           <div className="text-center mt-6">
             <p className="text-purple-400/60 text-sm font-medium">
               "Where AI meets the art of mixology" 🍹✨

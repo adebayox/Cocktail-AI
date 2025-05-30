@@ -7,11 +7,48 @@ import {
   Copy,
   ExternalLink,
   X,
+  Check,
 } from "lucide-react";
 import RecipeChat from "./RecipeChat";
 import RatingFeedbackForm from "../RatingFeedbackForm";
 import RecipeRatings from "../RecipeRatings";
 import { toast } from "react-toastify";
+
+// QR Code component
+const QRCodeCanvas = ({ value, size = 180 }) => {
+  const canvasRef = React.useRef(null);
+
+  useEffect(() => {
+    if (!canvasRef.current || !value) return;
+
+    // generate QR code
+    const script = document.createElement("script");
+    script.src =
+      "https://cdnjs.cloudflare.com/ajax/libs/qrious/4.0.2/qrious.min.js";
+    script.onload = () => {
+      if (window.QRious) {
+        new window.QRious({
+          element: canvasRef.current,
+          value: value,
+          size: size,
+          foreground: "#7c3aed",
+          background: "#ffffff",
+        });
+      }
+    };
+    document.head.appendChild(script);
+
+    return () => {
+      if (document.head.contains(script)) {
+        document.head.removeChild(script);
+      }
+    };
+  }, [value, size]);
+
+  return (
+    <canvas ref={canvasRef} className="border border-purple-200 rounded-lg" />
+  );
+};
 
 const RecipeDisplay = ({
   recipe,
@@ -23,9 +60,9 @@ const RecipeDisplay = ({
   onDeleteCocktail,
 }) => {
   const [showShareModal, setShowShareModal] = useState(false);
-  const [ratingsKey, setRatingsKey] = useState(0); // Add this state to force re-render
+  const [ratingsKey, setRatingsKey] = useState(0);
+  const [copied, setCopied] = useState(false);
 
-  // Add CSS to hide scrollbar for WebKit browsers
   useEffect(() => {
     const style = document.createElement("style");
     style.textContent = `
@@ -76,27 +113,36 @@ const RecipeDisplay = ({
   const copyToClipboard = async () => {
     try {
       await navigator.clipboard.writeText(getShareableLink());
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2000);
       toast.success("Link copied to clipboard!");
     } catch (err) {
-      toast.error("Failed to copy link");
+      // Fallback for older browsers
+      const textArea = document.createElement("textarea");
+      textArea.value = getShareableLink();
+      document.body.appendChild(textArea);
+      textArea.select();
+      document.execCommand("copy");
+      document.body.removeChild(textArea);
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2000);
+      toast.success("Link copied to clipboard!");
     }
   };
 
-  // Add this callback function to handle rating submission
   const handleRatingSubmitted = () => {
-    setRatingsKey((prev) => prev + 1); // This will force RecipeRatings to re-render
+    setRatingsKey((prev) => prev + 1);
   };
 
   return (
     <div
       className="max-h-screen overflow-y-auto pb-4 hide-scrollbar"
       style={{
-        scrollbarWidth: "none" /* Firefox */,
-        msOverflowStyle: "none" /* Internet Explorer 10+ */,
+        scrollbarWidth: "none",
+        msOverflowStyle: "none",
       }}
     >
       <div className="max-w-4xl mx-auto bg-white rounded-xl shadow-lg p-4 sm:p-6 lg:p-8 mb-4 sm:mb-8 mx-4 sm:mx-auto">
-        {/* Header Section */}
         <div className="flex flex-col sm:flex-row sm:justify-between sm:items-start mb-6 space-y-4 sm:space-y-0">
           <div className="flex-1 pr-0 sm:pr-4">
             <h3 className="text-xl sm:text-2xl font-bold text-purple-900 leading-tight">
@@ -107,7 +153,6 @@ const RecipeDisplay = ({
             </p>
           </div>
 
-          {/* Action buttons */}
           <div className="flex space-x-3 sm:space-x-4 flex-shrink-0">
             <button
               onClick={onSave}
@@ -196,7 +241,6 @@ const RecipeDisplay = ({
 
         {/* Ingredients and Instructions */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 lg:gap-8">
-          {/* Ingredients */}
           <div className="order-1">
             <h4 className="text-base sm:text-lg font-semibold mb-4 text-purple-800">
               Ingredients
@@ -214,7 +258,6 @@ const RecipeDisplay = ({
             </ul>
           </div>
 
-          {/* Instructions */}
           <div className="order-2">
             <h4 className="text-base sm:text-lg font-semibold mb-4 text-purple-800">
               Instructions
@@ -234,7 +277,6 @@ const RecipeDisplay = ({
           </div>
         </div>
 
-        {/* Tip section */}
         {recipe.tip && (
           <div className="mt-6 bg-purple-50 p-4 rounded-lg">
             <h4 className="text-base sm:text-lg font-semibold text-purple-800 mb-2">
@@ -244,7 +286,6 @@ const RecipeDisplay = ({
           </div>
         )}
 
-        {/* Tags */}
         {recipe.tags && Array.isArray(recipe.tags) && (
           <div className="mt-6 flex flex-wrap gap-2">
             {recipe.tags.map((tag) => (
@@ -259,56 +300,96 @@ const RecipeDisplay = ({
         )}
       </div>
 
-      {/* Share Modal */}
+      {/* Share Modal with QR Code */}
       {showShareModal && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-          <div className="bg-white rounded-lg overflow-hidden w-full max-w-md mx-4 relative">
-            {/* Simple header with close button */}
-            <div className="bg-white px-4 py-3 flex items-center justify-between">
-              <h3 className="text-base sm:text-lg font-medium text-purple-900">
-                Share Recipe
-              </h3>
+          <div className="bg-white rounded-xl shadow-2xl overflow-hidden w-full max-w-md mx-4">
+            <div className="bg-gradient-to-r from-purple-600 to-pink-600 p-4 text-white relative">
               <button
                 onClick={() => setShowShareModal(false)}
-                className="text-gray-500 hover:text-gray-700 p-1"
-                aria-label="Close modal"
+                className="absolute top-3 right-3 text-white hover:text-gray-200 transition-colors"
               >
                 <X className="w-5 h-5" />
               </button>
+              <div className="flex items-center space-x-2">
+                <Share2 className="w-5 h-5" />
+                <h3 className="text-lg font-bold">Share Recipe</h3>
+              </div>
+              <p className="text-purple-100 mt-1 text-sm">
+                Share "{analysis?.cocktailName || recipe.name}" with friends
+              </p>
             </div>
 
             {/* Modal content */}
-            <div className="p-4 sm:p-6">
-              <div className="bg-gray-50 p-3 rounded-lg mb-4 flex items-center justify-between">
-                <div className="truncate mr-2 text-xs sm:text-sm flex-1">
-                  {getShareableLink()}
+            <div className="p-6 space-y-6">
+              <div className="text-center">
+                <h4 className="text-lg font-semibold text-gray-800 mb-4">
+                  Scan QR Code
+                </h4>
+                <div className="flex justify-center mb-4">
+                  <QRCodeCanvas value={getShareableLink()} size={160} />
                 </div>
-                <button
-                  onClick={copyToClipboard}
-                  className="text-purple-600 hover:text-purple-800 flex-shrink-0 p-1"
-                  aria-label="Copy link"
-                >
-                  <Copy className="w-4 h-4 sm:w-5 sm:h-5" />
-                </button>
+                <p className="text-sm text-gray-600">
+                  Scan with your phone's camera to view this recipe
+                </p>
               </div>
-              <div className="flex flex-col sm:flex-row sm:justify-between space-y-2 sm:space-y-0">
+
+              {/* Divider */}
+              <div className="flex items-center">
+                <div className="flex-grow border-t border-gray-200"></div>
+                <span className="px-4 text-sm text-gray-500">or</span>
+                <div className="flex-grow border-t border-gray-200"></div>
+              </div>
+
+              <div>
+                <h4 className="text-lg font-semibold text-gray-800 mb-3">
+                  Copy Link
+                </h4>
+                <div className="bg-gray-50 p-3 rounded-lg mb-4 flex items-center justify-between">
+                  <div className="truncate mr-2 text-xs sm:text-sm flex-1">
+                    {getShareableLink()}
+                  </div>
+                  <button
+                    onClick={copyToClipboard}
+                    className="bg-purple-600 text-white p-2 rounded-lg hover:bg-purple-700 transition-colors flex items-center space-x-1 min-w-[70px]"
+                  >
+                    {copied ? (
+                      <>
+                        <Check className="w-4 h-4" />
+                        <span className="text-xs">Copied!</span>
+                      </>
+                    ) : (
+                      <>
+                        <Copy className="w-4 h-4" />
+                        <span className="text-xs">Copy</span>
+                      </>
+                    )}
+                  </button>
+                </div>
+              </div>
+
+              {/* Socials */}
+              <div className="flex justify-center">
                 <a
                   href={`https://twitter.com/intent/tweet?text=Check%20out%20this%20amazing%20cocktail%20recipe!&url=${encodeURIComponent(
                     getShareableLink()
                   )}`}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="text-purple-600 hover:text-purple-800 flex items-center justify-center sm:justify-start text-sm sm:text-base py-2 sm:py-0"
+                  className="text-purple-600 hover:text-purple-800 flex items-center text-sm"
                 >
                   Share on Twitter <ExternalLink className="w-4 h-4 ml-1" />
                 </a>
-                <button
-                  onClick={() => setShowShareModal(false)}
-                  className="sm:hidden bg-purple-600 text-white px-4 py-2 rounded-lg text-sm font-medium"
-                >
-                  Close
-                </button>
               </div>
+            </div>
+
+            <div className="bg-gray-50 px-6 py-4">
+              <button
+                onClick={() => setShowShareModal(false)}
+                className="w-full bg-gray-600 text-white py-2 px-4 rounded-lg hover:bg-gray-700 transition-colors"
+              >
+                Close
+              </button>
             </div>
           </div>
         </div>
@@ -321,7 +402,6 @@ const RecipeDisplay = ({
           onRatingSubmitted={handleRatingSubmitted}
         />
 
-        {/* Display Ratings */}
         <RecipeRatings recipeId={recipeId} key={ratingsKey} />
 
         <RecipeChat recipe={recipe} />

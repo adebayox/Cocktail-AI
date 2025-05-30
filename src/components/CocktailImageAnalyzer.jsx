@@ -30,7 +30,7 @@ const CocktailImageAnalyzer = ({ onAnalysisComplete }) => {
       reader.readAsDataURL(selectedImage);
       reader.onloadend = async () => {
         const base64data = reader.result;
-        // Remove data:image/jpeg;base64, part if needed
+
         const imageData = base64data.includes("base64,")
           ? base64data.split("base64,")[1]
           : base64data;
