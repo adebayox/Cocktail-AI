@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useMemo } from "react";
 import {
   Lock,
   Mail,
@@ -10,6 +10,9 @@ import {
   Zap,
   ChefHat,
   Star,
+  Check,
+  X,
+  AlertCircle,
 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { publicFetch } from "../utility/fetchFunction";
@@ -26,8 +29,45 @@ const SignUp = () => {
   });
   const [showPassword, setShowPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
+  const [showPasswordHelp, setShowPasswordHelp] = useState(false);
 
   const navigate = useNavigate();
+
+  // Password strength validation
+  const passwordValidation = useMemo(() => {
+    const password = formData.password;
+    const checks = {
+      length: password.length >= 8,
+      uppercase: /[A-Z]/.test(password),
+      lowercase: /[a-z]/.test(password),
+      number: /\d/.test(password),
+      special: /[!@#$%^&*(),.?":{}|<>]/.test(password),
+    };
+
+    const passedChecks = Object.values(checks).filter(Boolean).length;
+    let strength = "weak";
+    let color = "text-red-400";
+    let bgColor = "bg-red-400";
+
+    if (passedChecks >= 5) {
+      strength = "strong";
+      color = "text-green-400";
+      bgColor = "bg-green-400";
+    } else if (passedChecks >= 3) {
+      strength = "medium";
+      color = "text-yellow-400";
+      bgColor = "bg-yellow-400";
+    }
+
+    return {
+      checks,
+      strength,
+      color,
+      bgColor,
+      score: passedChecks,
+      isValid: passedChecks >= 4, // Require at least 4 criteria
+    };
+  }, [formData.password]);
 
   const signUpMutation = useMutation({
     mutationFn: (data) =>
@@ -41,7 +81,6 @@ const SignUp = () => {
         },
       }),
     onSuccess: (res) => {
-      // console.log(res);
       console.log(res.data?.code);
       if (res.data?.code == "00") {
         navigate("/login");
@@ -63,13 +102,89 @@ const SignUp = () => {
       ...prevData,
       [name]: value,
     }));
+
+    // Show password help when user starts typing password
+    if (name === "password" && value.length > 0 && !showPasswordHelp) {
+      setShowPasswordHelp(true);
+    }
   };
 
   const handleSubmit = (e) => {
     e.preventDefault();
+
+    // Check password strength before submitting
+    if (!passwordValidation.isValid) {
+      toast.error("Please create a stronger password following the guidelines");
+      return;
+    }
+
     setIsLoading(true);
     signUpMutation.mutate(formData);
   };
+
+  const PasswordStrengthIndicator = () => (
+    <div className="mt-2">
+      {/* Strength Bar */}
+      <div className="flex space-x-1 mb-2">
+        {[1, 2, 3, 4, 5].map((level) => (
+          <div
+            key={level}
+            className={`h-1 flex-1 rounded-full transition-all duration-300 ${
+              level <= passwordValidation.score
+                ? passwordValidation.bgColor
+                : "bg-white/20"
+            }`}
+          />
+        ))}
+      </div>
+
+      {/* Strength Label */}
+      <div className="flex items-center justify-between mb-3">
+        <span className={`text-sm font-medium ${passwordValidation.color}`}>
+          Password strength: {passwordValidation.strength}
+        </span>
+        {passwordValidation.isValid && (
+          <Check className="w-4 h-4 text-green-400" />
+        )}
+      </div>
+
+      {/* Password Requirements */}
+      {showPasswordHelp && (
+        <div className="bg-white/5 rounded-lg p-3 border border-white/10">
+          <p className="text-purple-200 text-sm font-medium mb-2 flex items-center">
+            <Lock className="w-4 h-4 mr-2" />
+            Password Requirements:
+          </p>
+          <div className="space-y-1">
+            {[
+              { key: "length", text: "At least 8 characters long" },
+              { key: "uppercase", text: "One uppercase letter (A-Z)" },
+              { key: "lowercase", text: "One lowercase letter (a-z)" },
+              { key: "number", text: "One number (0-9)" },
+              { key: "special", text: "One special character (!@#$%^&*)" },
+            ].map(({ key, text }) => (
+              <div key={key} className="flex items-center text-xs">
+                {passwordValidation.checks[key] ? (
+                  <Check className="w-3 h-3 text-green-400 mr-2 flex-shrink-0" />
+                ) : (
+                  <X className="w-3 h-3 text-red-400 mr-2 flex-shrink-0" />
+                )}
+                <span
+                  className={`${
+                    passwordValidation.checks[key]
+                      ? "text-green-300"
+                      : "text-purple-300/80"
+                  }`}
+                >
+                  {text}
+                </span>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+    </div>
+  );
 
   return (
     <div className="min-h-screen relative overflow-hidden bg-gradient-to-br from-purple-900 via-purple-800 to-indigo-900">
@@ -200,9 +315,16 @@ const SignUp = () => {
                     <Lock className="h-5 w-5 text-purple-400" />
                   </div>
                   <input
-                    className="w-full pl-12 pr-12 py-3 bg-white/10 backdrop-blur border border-white/20 rounded-xl text-white placeholder-purple-300/60
+                    className={`w-full pl-12 pr-12 py-3 bg-white/10 backdrop-blur border rounded-xl text-white placeholder-purple-300/60
                              focus:ring-2 focus:ring-purple-400/50 focus:border-purple-400/50 focus:bg-white/15
-                             transition-all duration-200 hover:bg-white/12"
+                             transition-all duration-200 hover:bg-white/12 ${
+                               formData.password && !passwordValidation.isValid
+                                 ? "border-red-400/50"
+                                 : formData.password &&
+                                   passwordValidation.isValid
+                                 ? "border-green-400/50"
+                                 : "border-white/20"
+                             }`}
                     type={showPassword ? "text" : "password"}
                     name="password"
                     required
@@ -222,11 +344,17 @@ const SignUp = () => {
                     )}
                   </button>
                 </div>
+
+                {/* Password Strength Indicator */}
+                {formData.password && <PasswordStrengthIndicator />}
               </div>
 
               <button
                 type="submit"
-                disabled={signUpMutation.isPending}
+                disabled={
+                  signUpMutation.isPending ||
+                  (formData.password && !passwordValidation.isValid)
+                }
                 className="w-full py-3 px-6 bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 
                          text-white font-semibold rounded-xl shadow-lg
                          focus:outline-none focus:ring-2 focus:ring-purple-400/50
@@ -247,6 +375,16 @@ const SignUp = () => {
                   </>
                 )}
               </button>
+
+              {/* Password warning if weak */}
+              {formData.password && !passwordValidation.isValid && (
+                <div className="flex items-center space-x-2 text-red-400 text-sm bg-red-400/10 rounded-lg p-3 border border-red-400/20">
+                  <AlertCircle className="w-4 h-4 flex-shrink-0" />
+                  <span>
+                    Please create a stronger password to secure your account
+                  </span>
+                </div>
+              )}
             </form>
 
             <div className="mt-8 text-center">
