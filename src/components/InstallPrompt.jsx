@@ -7,6 +7,40 @@ const InstallPrompt = () => {
   const [isIOS, setIsIOS] = useState(false);
   const [isStandalone, setIsStandalone] = useState(false);
 
+  // Days before showing prompt again after dismissal (7 days)
+  const REMINDER_INTERVAL_DAYS = 7;
+
+  const shouldShowPrompt = () => {
+    // Check if already installed
+    if (isStandalone) return false;
+
+    // Check dismissal status
+    const dismissedData = localStorage.getItem("pwa-install-dismissed");
+    if (!dismissedData) return true; // Never dismissed
+
+    try {
+      const dismissed = JSON.parse(dismissedData);
+      const dismissedDate = new Date(dismissed.timestamp);
+      const now = new Date();
+      const daysSinceDismissed = (now - dismissedDate) / (1000 * 60 * 60 * 24);
+
+      // Show again if enough days have passed
+      if (daysSinceDismissed >= REMINDER_INTERVAL_DAYS) {
+        return true;
+      }
+
+      // Also show if user has visited multiple times (engagement-based)
+      const visitCount = dismissed.visitCount || 0;
+      if (visitCount >= 3 && daysSinceDismissed >= 3) {
+        return true;
+      }
+
+      return false;
+    } catch {
+      return true; // If parse fails, show it
+    }
+  };
+
   useEffect(() => {
     // Check if already installed (standalone mode)
     const standalone = window.matchMedia("(display-mode: standalone)").matches 
@@ -17,27 +51,36 @@ const InstallPrompt = () => {
     const iOS = /iPad|iPhone|iPod/.test(navigator.userAgent);
     setIsIOS(iOS);
 
+    // Track visit count
+    const dismissedData = localStorage.getItem("pwa-install-dismissed");
+    if (dismissedData && !standalone) {
+      try {
+        const dismissed = JSON.parse(dismissedData);
+        dismissed.visitCount = (dismissed.visitCount || 0) + 1;
+        dismissed.lastVisit = new Date().toISOString();
+        localStorage.setItem("pwa-install-dismissed", JSON.stringify(dismissed));
+      } catch {
+        // Ignore parse errors
+      }
+    }
+
     // Listen for beforeinstallprompt (Android/Desktop Chrome)
     const handleBeforeInstall = (e) => {
       e.preventDefault();
       setInstallPrompt(e);
       
-      // Check if user dismissed before
-      const dismissed = localStorage.getItem("pwa-install-dismissed");
-      if (!dismissed && !standalone) {
-        setShowPrompt(true);
+      if (shouldShowPrompt()) {
+        // Delay slightly to not be intrusive
+        setTimeout(() => setShowPrompt(true), 2000);
       }
     };
 
     window.addEventListener("beforeinstallprompt", handleBeforeInstall);
 
-    // Show iOS prompt if on iOS and not installed
-    if (iOS && !standalone) {
-      const dismissed = localStorage.getItem("pwa-install-dismissed");
-      if (!dismissed) {
-        // Delay showing to not be intrusive
-        setTimeout(() => setShowPrompt(true), 3000);
-      }
+    // Show iOS prompt if on iOS and should show
+    if (iOS && shouldShowPrompt()) {
+      // Delay showing to not be intrusive
+      setTimeout(() => setShowPrompt(true), 3000);
     }
 
     return () => {
@@ -51,13 +94,33 @@ const InstallPrompt = () => {
     const result = await installPrompt.prompt();
     console.log("Install prompt result:", result);
     
+    // Mark as installed
+    localStorage.setItem("pwa-install-dismissed", JSON.stringify({
+      timestamp: new Date().toISOString(),
+      installed: true
+    }));
+    
     setInstallPrompt(null);
     setShowPrompt(false);
   };
 
   const handleDismiss = () => {
     setShowPrompt(false);
-    localStorage.setItem("pwa-install-dismissed", "true");
+    
+    // Store dismissal with timestamp and visit count
+    const dismissedData = localStorage.getItem("pwa-install-dismissed");
+    let data = { timestamp: new Date().toISOString(), visitCount: 0 };
+    
+    if (dismissedData) {
+      try {
+        const existing = JSON.parse(dismissedData);
+        data.visitCount = existing.visitCount || 0;
+      } catch {
+        // Reset if corrupted
+      }
+    }
+    
+    localStorage.setItem("pwa-install-dismissed", JSON.stringify(data));
   };
 
   // Don't show if already installed

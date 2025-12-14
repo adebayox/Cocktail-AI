@@ -13,7 +13,9 @@ import SignUp from "./pages/SignUp";
 import Login from "./pages/Login";
 import HomePage from "./pages/HomePage";
 import SharedRecipe from "./pages/SharedRecipe";
+import Unauthorized from "./pages/Unauthorized";
 import InstallPrompt from "./components/InstallPrompt";
+import ProtectedRoute from "./components/ProtectedRoute";
 
 // Register service worker
 if ("serviceWorker" in navigator) {
@@ -50,8 +52,16 @@ const router = createBrowserRouter([
     element: <Login />,
   },
   {
+    path: "/unauthorized",
+    element: <Unauthorized />,
+  },
+  {
     path: "/home",
-    element: <HomePage />,
+    element: (
+      <ProtectedRoute>
+        <HomePage />
+      </ProtectedRoute>
+    ),
   },
   {
     path: "/home/recipe/:recipeId",
