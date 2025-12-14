@@ -1,6 +1,6 @@
 import React, { useState, useRef } from "react";
-import { Upload, X, Camera, Loader2 } from "lucide-react";
-import { privateFetch } from "../utility/fetchFunction"; // Import your fetch utility
+import { Upload, X, Camera } from "lucide-react";
+import { privateFetch } from "../utility/fetchFunction";
 
 const ImageUploader = ({ onAnalysisComplete, isAnalyzing, setIsAnalyzing }) => {
   const [image, setImage] = useState(null);
@@ -12,7 +12,6 @@ const ImageUploader = ({ onAnalysisComplete, isAnalyzing, setIsAnalyzing }) => {
       const file = e.target.files[0];
       setImage(file);
 
-      // Create preview URL
       const reader = new FileReader();
       reader.onload = (event) => {
         const previewUrl = event.target.result;
@@ -37,8 +36,6 @@ const ImageUploader = ({ onAnalysisComplete, isAnalyzing, setIsAnalyzing }) => {
       if (response?.data?.code === "00") {
         const analysisData = response.data.analysis;
         console.log("Analysis data with image:", analysisData);
-
-        // Pass both the analysis data and the preview URL
         onAnalysisComplete(analysisData, imageData);
       } else {
         throw new Error(response?.data?.message || "Failed to analyze image");
@@ -60,21 +57,25 @@ const ImageUploader = ({ onAnalysisComplete, isAnalyzing, setIsAnalyzing }) => {
   };
 
   return (
-    <div className="mb-6">
-      <div className="text-lg font-semibold text-purple-900 mb-2">
-        Identify Cocktail from Image
-      </div>
+    <div>
+      <label className="block text-xs font-bold uppercase tracking-wide mb-3 text-black">
+        Identify from Image
+      </label>
 
       {!previewUrl ? (
         <div
           onClick={() => fileInputRef.current.click()}
-          className="border-2 border-dashed border-purple-300 rounded-lg p-6 flex flex-col items-center justify-center cursor-pointer hover:border-purple-500 transition-colors"
+          className="border-4 border-dashed border-black p-8 flex flex-col items-center justify-center cursor-pointer hover:border-brutal-accent hover:bg-brutal-accent/5 transition-all group"
         >
-          <Upload className="w-10 h-10 text-purple-500 mb-2" />
-          <p className="text-purple-700 font-medium">
-            Click to upload a cocktail image
+          <div className="w-16 h-16 bg-black flex items-center justify-center mb-4 group-hover:bg-brutal-accent transition-colors">
+            <Upload className="w-8 h-8 text-brutal-accent group-hover:text-black transition-colors" strokeWidth={2.5} />
+          </div>
+          <p className="font-display font-bold uppercase text-black text-center mb-1">
+            Upload Cocktail Image
           </p>
-          <p className="text-purple-500 text-sm mt-1">or drag and drop</p>
+          <p className="font-mono text-xs text-brutal-disabled uppercase">
+            Click or drag & drop
+          </p>
           <input
             type="file"
             ref={fileInputRef}
@@ -84,26 +85,29 @@ const ImageUploader = ({ onAnalysisComplete, isAnalyzing, setIsAnalyzing }) => {
           />
         </div>
       ) : (
-        <div className="relative">
+        <div className="relative border-4 border-black">
           <img
             src={previewUrl}
             alt="Cocktail preview"
-            className="w-full h-48 object-cover rounded-lg"
+            className="w-full h-48 object-cover"
           />
           <button
             onClick={resetImage}
-            className="absolute top-2 right-2 bg-red-500 text-white rounded-full p-1 hover:bg-red-600 transition-colors"
             disabled={isAnalyzing}
+            className="absolute top-2 right-2 bg-brutal-error text-white p-2 border-2 border-black hover:bg-black hover:text-brutal-error transition-colors disabled:opacity-50"
           >
-            <X className="w-5 h-5" />
+            <X className="w-5 h-5" strokeWidth={3} />
           </button>
 
           {isAnalyzing && (
-            <div className="absolute inset-0 bg-black bg-opacity-50 flex items-center justify-center rounded-lg">
-              <div className="text-white flex flex-col items-center">
-                <Loader2 className="w-8 h-8 animate-spin mb-2" />
-                <p>Analyzing cocktail...</p>
-              </div>
+            <div className="absolute inset-0 bg-black/90 flex flex-col items-center justify-center">
+              <div className="w-12 h-12 border-4 border-brutal-accent border-t-transparent animate-spin mb-4" />
+              <p className="font-display font-bold uppercase text-brutal-accent text-lg">
+                Analyzing...
+              </p>
+              <p className="font-mono text-xs text-brutal-white/60 uppercase mt-1">
+                Identifying cocktail
+              </p>
             </div>
           )}
         </div>

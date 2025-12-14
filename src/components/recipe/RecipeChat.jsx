@@ -1,19 +1,21 @@
 import React, { useState, useRef, useEffect } from "react";
 import { Send, ChevronDown, ChevronUp } from "lucide-react";
 import { privateFetch } from "../../utility/fetchFunction";
+import useUserStore from "../../store/useUserStore";
 
 const RecipeChat = ({ recipe }) => {
   const [isExpanded, setIsExpanded] = useState(false);
   const [messages, setMessages] = useState([]);
   const [inputValue, setInputValue] = useState("");
   const [isLoading, setIsLoading] = useState(false);
+  const [streamingMessage, setStreamingMessage] = useState("");
   const chatContainerRef = useRef(null);
   const inputRef = useRef(null);
+  const abortControllerRef = useRef(null);
 
   useEffect(() => {
     if (chatContainerRef.current && isExpanded) {
-      chatContainerRef.current.scrollTop =
-        chatContainerRef.current.scrollHeight;
+      chatContainerRef.current.scrollTop = chatContainerRef.current.scrollHeight;
     }
   }, [messages, isExpanded]);
 
@@ -22,6 +24,75 @@ const RecipeChat = ({ recipe }) => {
       inputRef.current.focus();
     }
   }, [isExpanded]);
+
+  const streamChat = async (message, recipeContext) => {
+    const token = useUserStore.getState().user?.token;
+    const baseURL = import.meta.env.VITE_API_BASE_URL;
+
+    abortControllerRef.current = new AbortController();
+
+    try {
+      const response = await fetch(`${baseURL}cocktail/chat/stream`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({ message, recipeContext }),
+        signal: abortControllerRef.current.signal,
+      });
+
+      if (!response.ok) {
+        throw new Error("Failed to start streaming chat");
+      }
+
+      const reader = response.body.getReader();
+      const decoder = new TextDecoder();
+      let fullMessage = "";
+
+      while (true) {
+        const { done, value } = await reader.read();
+        if (done) break;
+
+        const chunk = decoder.decode(value);
+        const lines = chunk.split("\n");
+
+        for (const line of lines) {
+          if (line.startsWith("data: ")) {
+            try {
+              const data = JSON.parse(line.slice(6));
+              if (!data.done) {
+                fullMessage += data.content;
+                setStreamingMessage(fullMessage);
+              }
+            } catch (parseError) {
+              // Skip malformed JSON
+            }
+          }
+        }
+      }
+
+      return fullMessage;
+    } catch (error) {
+      if (error.name === "AbortError") {
+        return null;
+      }
+      throw error;
+    }
+  };
+
+  const regularChat = async (message, recipeContext) => {
+    const response = await privateFetch.request({
+      method: "POST",
+      url: "cocktail/chat",
+      data: { message, recipeContext },
+    });
+
+    if (response?.data?.code === "00") {
+      return response.data.message;
+    }
+    throw new Error(response?.data?.message || "Failed to get response");
+  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -34,44 +105,41 @@ const RecipeChat = ({ recipe }) => {
     };
 
     setMessages((prev) => [...prev, userMessage]);
+    const messageToSend = inputValue;
     setInputValue("");
     setIsLoading(true);
+    setStreamingMessage("");
 
     try {
-      const response = await privateFetch.request({
-        method: "POST",
-        url: "cocktail/chat",
-        data: {
-          message: inputValue,
-          recipeContext: recipe,
-        },
-      });
+      let responseMessage;
 
-      if (response?.data?.code === "00") {
+      try {
+        responseMessage = await streamChat(messageToSend, recipe);
+      } catch (streamError) {
+        responseMessage = await regularChat(messageToSend, recipe);
+      }
+
+      if (responseMessage) {
         const assistantMessage = {
           id: Date.now() + 1,
           role: "assistant",
-          content: response.data.message,
+          content: responseMessage,
         };
-
         setMessages((prev) => [...prev, assistantMessage]);
-      } else {
-        throw new Error(response?.data?.message || "Failed to get response");
       }
     } catch (error) {
       console.error("Chat error:", error);
-
-      // Add error message
       setMessages((prev) => [
         ...prev,
         {
           id: Date.now() + 1,
           role: "assistant",
-          content: "Sorry, I couldn't process your request. Please try again.",
+          content: "Error. Try again.",
         },
       ]);
     } finally {
       setIsLoading(false);
+      setStreamingMessage("");
     }
   };
 
@@ -80,94 +148,90 @@ const RecipeChat = ({ recipe }) => {
   };
 
   return (
-    <div className="fixed bottom-2 sm:bottom-4 left-2 right-2 sm:left-auto sm:right-4 z-50 w-auto sm:w-full sm:max-w-md">
-      <div className="bg-white rounded-t-xl shadow-lg border border-gray-200">
+    <div className="fixed bottom-4 left-4 right-4 sm:left-auto sm:right-4 z-50 w-auto sm:w-full sm:max-w-md">
+      <div className="bg-brutal-white border-4 border-black shadow-brutal-lg">
+        {/* Header */}
         <button
           onClick={toggleChat}
-          className="w-full flex items-center justify-between p-3 sm:p-4 bg-purple-600 text-white rounded-t-xl hover:bg-purple-700 transition-colors"
+          className="w-full flex items-center justify-between p-4 bg-black text-brutal-accent hover:bg-brutal-accent hover:text-black transition-colors"
         >
-          <span className="font-medium text-sm sm:text-base">
-            Ask about this recipe
+          <span className="font-display font-bold uppercase text-sm">
+            Ask About This Recipe
           </span>
           {isExpanded ? (
-            <ChevronDown className="w-4 h-4 sm:w-5 sm:h-5" />
+            <ChevronDown className="w-5 h-5" strokeWidth={2.5} />
           ) : (
-            <ChevronUp className="w-4 h-4 sm:w-5 sm:h-5" />
+            <ChevronUp className="w-5 h-5" strokeWidth={2.5} />
           )}
         </button>
 
         {isExpanded && (
           <>
+            {/* Messages */}
             <div
               ref={chatContainerRef}
-              className="p-3 sm:p-4 h-48 sm:h-64 md:h-72 overflow-y-auto flex flex-col space-y-2 sm:space-y-3"
-              style={{
-                scrollbarWidth: "none",
-                msOverflowStyle: "none",
-              }}
+              className="p-4 h-64 overflow-y-auto flex flex-col gap-3 bg-brutal-black/5"
             >
-              {messages.length === 0 ? (
-                <div className="text-center text-gray-500 my-auto px-2">
-                  <p className="text-sm sm:text-base">
-                    Ask any questions about this cocktail recipe!
+              {messages.length === 0 && !streamingMessage ? (
+                <div className="text-center my-auto">
+                  <p className="font-mono text-sm text-brutal-disabled uppercase mb-3">
+                    Ask about this cocktail
                   </p>
-                  <p className="text-xs sm:text-sm mt-2">Examples:</p>
-                  <ul className="text-xs sm:text-sm text-purple-600 space-y-1">
-                    <li>"What can I substitute for lime juice?"</li>
-                    <li>"Why is the health rating {recipe.healthRating}?"</li>
-                    <li>"How can I make this less sweet?"</li>
-                  </ul>
+                  <div className="space-y-1 font-mono text-xs text-black/60">
+                    <p>"Substitute for lime juice?"</p>
+                    <p>"Make it less sweet?"</p>
+                    <p>"Why this health rating?"</p>
+                  </div>
                 </div>
               ) : (
-                messages.map((message) => (
-                  <div
-                    key={message.id}
-                    className={`max-w-xs sm:max-w-sm p-2 sm:p-3 rounded-lg text-sm sm:text-base leading-relaxed ${
-                      message.role === "user"
-                        ? "bg-purple-100 text-purple-900 ml-auto"
-                        : "bg-gray-100 text-gray-900 mr-auto"
-                    }`}
-                  >
-                    {message.content}
-                  </div>
-                ))
+                <>
+                  {messages.map((message) => (
+                    <div
+                      key={message.id}
+                      className={`max-w-[85%] p-3 font-mono text-sm ${
+                        message.role === "user"
+                          ? "bg-brutal-accent text-black ml-auto border-2 border-black"
+                          : "bg-brutal-white text-black mr-auto border-2 border-black"
+                      }`}
+                    >
+                      {message.content}
+                    </div>
+                  ))}
+                  {streamingMessage && (
+                    <div className="max-w-[85%] p-3 font-mono text-sm bg-brutal-white text-black mr-auto border-2 border-black">
+                      {streamingMessage}
+                      <span className="inline-block w-2 h-4 bg-brutal-accent ml-1 animate-pulse" />
+                    </div>
+                  )}
+                </>
               )}
-              {isLoading && (
-                <div className="bg-gray-100 p-2 sm:p-3 rounded-lg mr-auto flex items-center space-x-2">
-                  <div className="w-1.5 h-1.5 sm:w-2 sm:h-2 bg-purple-600 rounded-full animate-bounce"></div>
-                  <div
-                    className="w-1.5 h-1.5 sm:w-2 sm:h-2 bg-purple-600 rounded-full animate-bounce"
-                    style={{ animationDelay: "0.2s" }}
-                  ></div>
-                  <div
-                    className="w-1.5 h-1.5 sm:w-2 sm:h-2 bg-purple-600 rounded-full animate-bounce"
-                    style={{ animationDelay: "0.4s" }}
-                  ></div>
+              {isLoading && !streamingMessage && (
+                <div className="bg-brutal-white p-3 mr-auto border-2 border-black flex items-center gap-2">
+                  <div className="w-2 h-2 bg-brutal-accent animate-bounce" style={{ animationDelay: "0ms" }} />
+                  <div className="w-2 h-2 bg-brutal-accent animate-bounce" style={{ animationDelay: "150ms" }} />
+                  <div className="w-2 h-2 bg-brutal-accent animate-bounce" style={{ animationDelay: "300ms" }} />
                 </div>
               )}
             </div>
 
-            <form
-              onSubmit={handleSubmit}
-              className="p-3 sm:p-4 border-t border-gray-200"
-            >
-              <div className="flex items-center space-x-2">
+            {/* Input */}
+            <form onSubmit={handleSubmit} className="p-4 border-t-4 border-black">
+              <div className="flex gap-2">
                 <input
                   ref={inputRef}
                   type="text"
                   value={inputValue}
                   onChange={(e) => setInputValue(e.target.value)}
-                  placeholder="Ask about this recipe..."
-                  className="flex-1 p-2 sm:p-2.5 text-sm sm:text-base border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                  placeholder="Ask a question..."
+                  className="flex-1 border-4 border-black px-3 py-2 font-mono text-sm focus:outline-none focus:border-brutal-accent bg-white placeholder:text-brutal-disabled"
                   disabled={isLoading}
                 />
                 <button
                   type="submit"
-                  className="p-2 sm:p-2.5 bg-purple-600 text-white rounded-md hover:bg-purple-700 disabled:bg-purple-300 disabled:cursor-not-allowed transition-colors flex-shrink-0"
                   disabled={!inputValue.trim() || isLoading}
-                  aria-label="Send message"
+                  className="bg-black text-brutal-accent p-3 border-4 border-black hover:bg-brutal-accent hover:text-black transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                 >
-                  <Send className="w-4 h-4 sm:w-5 sm:h-5" />
+                  <Send className="w-5 h-5" strokeWidth={2.5} />
                 </button>
               </div>
             </form>

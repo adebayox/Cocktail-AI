@@ -6,14 +6,18 @@ const Overlay = ({ isOpen, onClose, children, zIndex = "z-50" }) => {
 
   return (
     <div
-      className={`fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 ${zIndex}`}
+      className={`fixed inset-0 bg-black/90 flex items-center justify-center p-4 ${zIndex}`}
+      onClick={onClose}
     >
-      <div className="bg-white rounded-xl shadow-lg p-8 max-w-2xl w-full">
+      <div 
+        className="bg-brutal-white border-4 border-black shadow-brutal-accent-lg p-6 sm:p-8 max-w-2xl w-full max-h-[90vh] overflow-y-auto relative"
+        onClick={(e) => e.stopPropagation()}
+      >
         <button
           onClick={onClose}
-          className="absolute top-4 right-4 text-gray-600 hover:text-gray-800"
+          className="absolute top-4 right-4 p-2 text-brutal-disabled hover:text-black hover:bg-brutal-accent/10 transition-colors"
         >
-          <X className="w-6 h-6" />
+          <X className="w-6 h-6" strokeWidth={2.5} />
         </button>
         {children}
       </div>

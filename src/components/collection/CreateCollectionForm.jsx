@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import { toast } from "react-toastify";
 
 const CreateCollectionForm = ({ onSubmit, onClose, isLoading }) => {
   const [name, setName] = useState("");
@@ -13,34 +14,39 @@ const CreateCollectionForm = ({ onSubmit, onClose, isLoading }) => {
   };
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-4">
+    <form onSubmit={handleSubmit} className="space-y-6">
       <div>
-        <label className="block text-sm font-medium text-purple-800 mb-2">
+        <h3 className="font-display text-2xl font-black uppercase text-black mb-6">
+          Create Collection
+        </h3>
+        
+        <label className="block text-xs font-bold uppercase tracking-wide mb-2 text-black">
           Collection Name
         </label>
         <input
           type="text"
           value={name}
           onChange={(e) => setName(e.target.value)}
-          placeholder="Enter collection name"
-          className="w-full border-2 border-purple-200 rounded-lg p-2 focus:outline-none focus:ring-2 focus:ring-purple-500"
+          placeholder="e.g. Summer Favorites"
+          className="w-full border-4 border-black px-4 py-4 text-lg font-mono focus:outline-none focus:border-brutal-accent bg-white placeholder:text-brutal-disabled"
           required
         />
       </div>
-      <div className="flex justify-end space-x-2">
+      
+      <div className="flex gap-4">
         <button
           type="button"
           onClick={onClose}
-          className="px-4 py-2 text-purple-600 hover:text-purple-800"
+          className="flex-1 py-3 font-mono text-sm uppercase font-bold border-4 border-black text-black hover:bg-black/5 transition-colors"
         >
           Cancel
         </button>
         <button
           type="submit"
           disabled={isLoading}
-          className="px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700"
+          className="flex-1 bg-black text-brutal-accent py-3 font-display font-bold uppercase border-4 border-black hover:bg-brutal-accent hover:text-black transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
         >
-          {isLoading ? "Creating..." : "Create Collection"}
+          {isLoading ? "Creating..." : "Create"}
         </button>
       </div>
     </form>

@@ -1,0 +1,26 @@
+{
+  "name": "Cocktail Generator",
+  "short_name": "Cocktails",
+  "description": "Generate cocktail recipes instantly",
+  "start_url": "/home",
+  "display": "standalone",
+  "background_color": "#0a0a0a",
+  "theme_color": "#00ff41",
+  "orientation": "portrait-primary",
+  "icons": [
+    {
+      "src": "/icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any"
+    },
+    {
+      "src": "/icon.svg",
+      "sizes": "512x512",
+      "type": "image/svg+xml",
+      "purpose": "maskable"
+    }
+  ],
+  "categories": ["food", "lifestyle", "utilities"]
+}
+

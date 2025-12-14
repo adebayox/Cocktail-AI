@@ -8,6 +8,7 @@ import {
   ExternalLink,
   X,
   Check,
+  ImageIcon,
 } from "lucide-react";
 import RecipeChat from "./RecipeChat";
 import RatingFeedbackForm from "../RatingFeedbackForm";
@@ -21,7 +22,6 @@ const QRCodeCanvas = ({ value, size = 180 }) => {
   useEffect(() => {
     if (!canvasRef.current || !value) return;
 
-    // generate QR code
     const script = document.createElement("script");
     script.src =
       "https://cdnjs.cloudflare.com/ajax/libs/qrious/4.0.2/qrious.min.js";
@@ -31,8 +31,8 @@ const QRCodeCanvas = ({ value, size = 180 }) => {
           element: canvasRef.current,
           value: value,
           size: size,
-          foreground: "#7c3aed",
-          background: "#ffffff",
+          foreground: "#0a0a0a",
+          background: "#f5f5f0",
         });
       }
     };
@@ -46,7 +46,7 @@ const QRCodeCanvas = ({ value, size = 180 }) => {
   }, [value, size]);
 
   return (
-    <canvas ref={canvasRef} className="border border-purple-200 rounded-lg" />
+    <canvas ref={canvasRef} className="border-4 border-black" />
   );
 };
 
@@ -76,7 +76,9 @@ const RecipeDisplay = ({
 
   if (!recipe) {
     return (
-      <div className="text-center text-purple-800 p-4">Loading recipe...</div>
+      <div className="text-center p-8 font-mono text-brutal-disabled uppercase">
+        Loading recipe...
+      </div>
     );
   }
 
@@ -95,10 +97,10 @@ const RecipeDisplay = ({
   };
 
   const getHealthRatingColor = (rating) => {
-    if (!rating && rating !== 0) return "bg-gray-200";
-    if (rating <= 3) return "bg-red-500";
+    if (!rating && rating !== 0) return "bg-brutal-disabled";
+    if (rating <= 3) return "bg-brutal-error";
     if (rating <= 6) return "bg-yellow-500";
-    return "bg-green-500";
+    return "bg-brutal-accent";
   };
 
   const handleShare = () => {
@@ -117,7 +119,6 @@ const RecipeDisplay = ({
       setTimeout(() => setCopied(false), 2000);
       toast.success("Link copied to clipboard!");
     } catch (err) {
-      // Fallback for older browsers
       const textArea = document.createElement("textarea");
       textArea.value = getShareableLink();
       document.body.appendChild(textArea);
@@ -142,133 +143,135 @@ const RecipeDisplay = ({
         msOverflowStyle: "none",
       }}
     >
-      <div className="max-w-4xl mx-auto bg-white rounded-xl shadow-lg p-4 sm:p-6 lg:p-8 mb-4 sm:mb-8 mx-4 sm:mx-auto">
-        <div className="flex flex-col sm:flex-row sm:justify-between sm:items-start mb-6 space-y-4 sm:space-y-0">
-          <div className="flex-1 pr-0 sm:pr-4">
-            <h3 className="text-xl sm:text-2xl font-bold text-purple-900 leading-tight">
+      {/* Main Recipe Card */}
+      <article className="bg-brutal-white border-4 border-black p-6 sm:p-8 shadow-brutal-accent-lg mb-8 transform rotate-[-0.3deg] hover:rotate-0 transition-transform">
+        {/* Header */}
+        <div className="flex flex-col sm:flex-row sm:justify-between sm:items-start mb-6 gap-4">
+          <div className="flex-1">
+            <h1 className="font-display text-3xl sm:text-4xl lg:text-5xl font-black uppercase text-black leading-[0.9] mb-3">
               {analysis?.cocktailName || recipe.name}
-            </h3>
-            <p className="text-purple-600 mt-2 text-sm sm:text-base">
+            </h1>
+            <p className="font-mono text-sm text-brutal-disabled leading-relaxed">
               {recipe.description}
             </p>
           </div>
 
-          <div className="flex space-x-3 sm:space-x-4 flex-shrink-0">
+          {/* Action Buttons */}
+          <div className="flex gap-2 flex-shrink-0">
             <button
               onClick={onSave}
-              className="text-purple-600 hover:text-purple-800 p-2 sm:p-1"
               disabled={isSaving}
+              className="p-3 bg-black text-brutal-accent border-4 border-black hover:bg-brutal-accent hover:text-black transition-colors disabled:opacity-50"
               aria-label="Save recipe"
             >
-              <Heart className="w-5 h-5 sm:w-6 sm:h-6" />
+              <Heart className="w-5 h-5" strokeWidth={2.5} />
             </button>
             <button
               onClick={handleAddToCollection}
-              className="text-purple-600 hover:text-purple-800 p-2 sm:p-1"
+              className="p-3 bg-black text-brutal-accent border-4 border-black hover:bg-brutal-accent hover:text-black transition-colors"
               aria-label="Add to collection"
             >
-              <FolderPlus className="w-5 h-5 sm:w-6 sm:h-6" />
+              <FolderPlus className="w-5 h-5" strokeWidth={2.5} />
             </button>
             <button
               onClick={handleShare}
-              className="text-purple-600 hover:text-purple-800 p-2 sm:p-1"
+              className="p-3 bg-black text-brutal-accent border-4 border-black hover:bg-brutal-accent hover:text-black transition-colors"
               aria-label="Share recipe"
             >
-              <Share2 className="w-5 h-5 sm:w-6 sm:h-6" />
+              <Share2 className="w-5 h-5" strokeWidth={2.5} />
             </button>
             {recipe._id && (
               <button
                 onClick={() => onDeleteCocktail(recipe._id)}
-                className="text-red-600 hover:text-red-800 p-2 sm:p-1"
+                className="p-3 bg-brutal-error text-white border-4 border-black hover:bg-black hover:text-brutal-error transition-colors"
                 aria-label="Delete recipe"
               >
-                <Trash2 className="w-5 h-5 sm:w-6 sm:h-6" />
+                <Trash2 className="w-5 h-5" strokeWidth={2.5} />
               </button>
             )}
           </div>
         </div>
 
-        {/* Image section */}
-        <div className="mb-6">
+        {/* Image */}
+        <div className="mb-8 border-4 border-black overflow-hidden">
           {uploadedImageUrl ? (
             <img
               src={uploadedImageUrl}
               alt="Uploaded Cocktail"
-              className="w-full h-48 sm:h-64 lg:h-80 object-cover rounded-lg shadow-md"
+              className="w-full h-48 sm:h-64 lg:h-80 object-cover"
             />
           ) : recipe.imageUrl ? (
             <img
               src={recipe.imageUrl}
               alt={recipe.name}
-              className="w-full h-48 sm:h-64 lg:h-80 object-cover rounded-lg shadow-md"
+              className="w-full h-48 sm:h-64 lg:h-80 object-cover"
             />
           ) : (
-            <div className="w-full h-48 sm:h-64 lg:h-80 bg-gradient-to-r from-purple-100 to-pink-100 rounded-lg flex items-center justify-center">
-              <p className="text-purple-500 font-medium text-sm sm:text-base">
+            <div className="w-full h-48 sm:h-64 lg:h-80 bg-brutal-black/5 flex flex-col items-center justify-center">
+              <ImageIcon className="w-16 h-16 text-brutal-disabled mb-3" strokeWidth={1.5} />
+              <p className="font-mono text-sm text-brutal-disabled uppercase">
                 No image available
               </p>
             </div>
           )}
         </div>
 
-        {/* Health Rating Display */}
+        {/* Health Rating */}
         {recipe.healthRating !== undefined && (
-          <div className="mb-6 bg-purple-50 p-4 rounded-lg">
+          <div className="mb-8 border-4 border-black p-4 bg-brutal-black/5">
             <div className="flex items-center justify-between">
-              <h4 className="text-base sm:text-lg font-semibold text-purple-800">
+              <span className="text-xs font-bold uppercase tracking-wide text-black">
                 Health Rating
-              </h4>
-              <div className="flex items-center">
+              </span>
+              <div className="flex items-center gap-2">
                 <div
-                  className={`w-8 h-8 sm:w-10 sm:h-10 rounded-full flex items-center justify-center text-white font-bold text-sm sm:text-base ${getHealthRatingColor(
+                  className={`w-12 h-12 flex items-center justify-center text-white font-display font-black text-xl ${getHealthRatingColor(
                     recipe.healthRating
                   )}`}
                 >
                   {recipe.healthRating}
                 </div>
-                <span className="ml-2 text-xs sm:text-sm text-purple-600">
-                  /10
-                </span>
+                <span className="font-mono text-sm text-brutal-disabled">/10</span>
               </div>
             </div>
             {recipe.healthNotes && (
-              <p className="mt-2 text-purple-600 text-sm sm:text-base">
+              <p className="mt-3 font-mono text-sm text-brutal-disabled">
                 {recipe.healthNotes}
               </p>
             )}
           </div>
         )}
 
-        {/* Ingredients and Instructions */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 lg:gap-8">
-          <div className="order-1">
-            <h4 className="text-base sm:text-lg font-semibold mb-4 text-purple-800">
+        {/* Ingredients and Instructions Grid */}
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+          {/* Ingredients */}
+          <div>
+            <h2 className="text-xs font-bold uppercase tracking-wide mb-4 text-black border-b-4 border-black pb-2">
               Ingredients
-            </h4>
-            <ul className="space-y-2 sm:space-y-3">
+            </h2>
+            <ul className="space-y-3">
               {Array.isArray(recipe.ingredients) &&
                 recipe.ingredients.map((ingredient, idx) => (
-                  <li key={idx} className="flex items-start space-x-3">
-                    <span className="w-2 h-2 bg-purple-400 rounded-full mt-2 flex-shrink-0"></span>
-                    <span className="text-sm sm:text-base leading-relaxed">
-                      {ingredient}
-                    </span>
+                  <li key={idx} className="flex items-start gap-3">
+                    <span className="w-2 h-2 bg-brutal-accent mt-2 flex-shrink-0" />
+                    <span className="font-mono text-sm">{ingredient}</span>
                   </li>
                 ))}
             </ul>
           </div>
 
-          <div className="order-2">
-            <h4 className="text-base sm:text-lg font-semibold mb-4 text-purple-800">
+          {/* Instructions */}
+          <div>
+            <h2 className="text-xs font-bold uppercase tracking-wide mb-4 text-black border-b-4 border-black pb-2">
               Instructions
-            </h4>
-            <ol className="space-y-3 sm:space-y-4">
+            </h2>
+            <ol className="space-y-4">
               {instructions.map((step, idx) => (
-                <li key={idx} className="flex space-x-3 sm:space-x-4">
-                  <span className="flex-shrink-0 w-6 h-6 bg-purple-100 rounded-full flex items-center justify-center text-purple-800 font-medium text-sm mt-0.5">
+                <li key={idx} className="flex gap-4">
+                  <span className="flex-shrink-0 w-8 h-8 bg-black text-brutal-accent flex items-center justify-center font-display font-bold text-sm">
                     {idx + 1}
                   </span>
-                  <span className="text-sm sm:text-base leading-relaxed">
+                  <span className="font-mono text-sm leading-relaxed pt-1">
                     {step}
                   </span>
                 </li>
@@ -277,116 +280,113 @@ const RecipeDisplay = ({
           </div>
         </div>
 
+        {/* Tip */}
         {recipe.tip && (
-          <div className="mt-6 bg-purple-50 p-4 rounded-lg">
-            <h4 className="text-base sm:text-lg font-semibold text-purple-800 mb-2">
-              Tip
-            </h4>
-            <p className="text-purple-600 text-sm sm:text-base">{recipe.tip}</p>
+          <div className="mt-8 border-4 border-brutal-accent bg-brutal-accent/10 p-4">
+            <h3 className="text-xs font-bold uppercase tracking-wide text-black mb-2">
+              Pro Tip
+            </h3>
+            <p className="font-mono text-sm">{recipe.tip}</p>
           </div>
         )}
 
-        {recipe.tags && Array.isArray(recipe.tags) && (
-          <div className="mt-6 flex flex-wrap gap-2">
+        {/* Tags */}
+        {recipe.tags && Array.isArray(recipe.tags) && recipe.tags.length > 0 && (
+          <div className="mt-8 flex flex-wrap gap-2">
             {recipe.tags.map((tag) => (
               <span
                 key={tag}
-                className="px-3 py-1 bg-purple-100 text-purple-800 rounded-full text-xs sm:text-sm"
+                className="px-3 py-1 bg-black text-brutal-accent font-mono text-xs font-bold uppercase"
               >
                 {tag}
               </span>
             ))}
           </div>
         )}
-      </div>
+      </article>
 
-      {/* Share Modal with QR Code */}
+      {/* Share Modal */}
       {showShareModal && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-          <div className="bg-white rounded-xl shadow-2xl overflow-hidden w-full max-w-md mx-4">
-            <div className="bg-gradient-to-r from-purple-600 to-pink-600 p-4 text-white relative">
+        <div className="fixed inset-0 bg-black/90 flex items-center justify-center z-50 p-4">
+          <div className="bg-brutal-white border-4 border-black shadow-brutal-accent-lg w-full max-w-md">
+            {/* Modal Header */}
+            <div className="bg-black p-4 flex justify-between items-center">
+              <div className="flex items-center gap-2">
+                <Share2 className="w-5 h-5 text-brutal-accent" strokeWidth={2.5} />
+                <h3 className="font-display font-bold uppercase text-brutal-accent">
+                  Share Recipe
+                </h3>
+              </div>
               <button
                 onClick={() => setShowShareModal(false)}
-                className="absolute top-3 right-3 text-white hover:text-gray-200 transition-colors"
+                className="text-brutal-white hover:text-brutal-accent transition-colors"
               >
-                <X className="w-5 h-5" />
+                <X className="w-5 h-5" strokeWidth={3} />
               </button>
-              <div className="flex items-center space-x-2">
-                <Share2 className="w-5 h-5" />
-                <h3 className="text-lg font-bold">Share Recipe</h3>
-              </div>
-              <p className="text-purple-100 mt-1 text-sm">
-                Share "{analysis?.cocktailName || recipe.name}" with friends
-              </p>
             </div>
 
-            {/* Modal content */}
+            {/* Modal Content */}
             <div className="p-6 space-y-6">
+              {/* QR Code */}
               <div className="text-center">
-                <h4 className="text-lg font-semibold text-gray-800 mb-4">
+                <p className="text-xs font-bold uppercase tracking-wide mb-4 text-black">
                   Scan QR Code
-                </h4>
-                <div className="flex justify-center mb-4">
+                </p>
+                <div className="flex justify-center">
                   <QRCodeCanvas value={getShareableLink()} size={160} />
                 </div>
-                <p className="text-sm text-gray-600">
-                  Scan with your phone's camera to view this recipe
-                </p>
               </div>
 
               {/* Divider */}
-              <div className="flex items-center">
-                <div className="flex-grow border-t border-gray-200"></div>
-                <span className="px-4 text-sm text-gray-500">or</span>
-                <div className="flex-grow border-t border-gray-200"></div>
+              <div className="flex items-center gap-4">
+                <div className="flex-1 h-1 bg-black" />
+                <span className="font-mono text-xs font-bold uppercase text-brutal-disabled">Or</span>
+                <div className="flex-1 h-1 bg-black" />
               </div>
 
+              {/* Copy Link */}
               <div>
-                <h4 className="text-lg font-semibold text-gray-800 mb-3">
+                <p className="text-xs font-bold uppercase tracking-wide mb-3 text-black">
                   Copy Link
-                </h4>
-                <div className="bg-gray-50 p-3 rounded-lg mb-4 flex items-center justify-between">
-                  <div className="truncate mr-2 text-xs sm:text-sm flex-1">
+                </p>
+                <div className="flex gap-2">
+                  <div className="flex-1 border-4 border-black px-3 py-2 bg-brutal-black/5 font-mono text-xs truncate">
                     {getShareableLink()}
                   </div>
                   <button
                     onClick={copyToClipboard}
-                    className="bg-purple-600 text-white p-2 rounded-lg hover:bg-purple-700 transition-colors flex items-center space-x-1 min-w-[70px]"
+                    className="bg-black text-brutal-accent px-4 border-4 border-black hover:bg-brutal-accent hover:text-black transition-colors flex items-center gap-2"
                   >
                     {copied ? (
-                      <>
-                        <Check className="w-4 h-4" />
-                        <span className="text-xs">Copied!</span>
-                      </>
+                      <Check className="w-4 h-4" strokeWidth={3} />
                     ) : (
-                      <>
-                        <Copy className="w-4 h-4" />
-                        <span className="text-xs">Copy</span>
-                      </>
+                      <Copy className="w-4 h-4" strokeWidth={2.5} />
                     )}
                   </button>
                 </div>
               </div>
 
-              {/* Socials */}
-              <div className="flex justify-center">
+              {/* Twitter Share */}
+              <div className="text-center">
                 <a
-                  href={`https://twitter.com/intent/tweet?text=Check%20out%20this%20amazing%20cocktail%20recipe!&url=${encodeURIComponent(
+                  href={`https://twitter.com/intent/tweet?text=Check%20out%20this%20cocktail%20recipe&url=${encodeURIComponent(
                     getShareableLink()
                   )}`}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="text-purple-600 hover:text-purple-800 flex items-center text-sm"
+                  className="inline-flex items-center gap-2 font-mono text-sm text-black hover:text-brutal-accent transition-colors underline decoration-2 underline-offset-2"
                 >
-                  Share on Twitter <ExternalLink className="w-4 h-4 ml-1" />
+                  Share on Twitter
+                  <ExternalLink className="w-4 h-4" strokeWidth={2.5} />
                 </a>
               </div>
             </div>
 
-            <div className="bg-gray-50 px-6 py-4">
+            {/* Modal Footer */}
+            <div className="border-t-4 border-black p-4">
               <button
                 onClick={() => setShowShareModal(false)}
-                className="w-full bg-gray-600 text-white py-2 px-4 rounded-lg hover:bg-gray-700 transition-colors"
+                className="w-full bg-brutal-disabled text-white py-3 font-display font-bold uppercase hover:bg-black transition-colors"
               >
                 Close
               </button>
@@ -395,8 +395,8 @@ const RecipeDisplay = ({
         </div>
       )}
 
-      {/* Rating and Feedback Form */}
-      <div className="mx-4 sm:mx-auto max-w-4xl">
+      {/* Rating and Feedback */}
+      <div className="space-y-8">
         <RatingFeedbackForm
           recipeId={recipeId}
           onRatingSubmitted={handleRatingSubmitted}

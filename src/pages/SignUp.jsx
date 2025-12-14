@@ -5,21 +5,16 @@ import {
   User,
   Eye,
   EyeOff,
-  Sparkles,
-  Wine,
-  Zap,
-  ChefHat,
-  Star,
   Check,
   X,
   AlertCircle,
+  ArrowRight,
 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { publicFetch } from "../utility/fetchFunction";
 import { useMutation } from "@tanstack/react-query";
 import { toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
-import Button from "../components/ui/Button";
 
 const SignUp = () => {
   const [formData, setFormData] = useState({
@@ -45,18 +40,18 @@ const SignUp = () => {
     };
 
     const passedChecks = Object.values(checks).filter(Boolean).length;
-    let strength = "weak";
-    let color = "text-red-400";
-    let bgColor = "bg-red-400";
+    let strength = "WEAK";
+    let color = "text-brutal-error";
+    let bgColor = "bg-brutal-error";
 
     if (passedChecks >= 5) {
-      strength = "strong";
-      color = "text-green-400";
-      bgColor = "bg-green-400";
+      strength = "STRONG";
+      color = "text-brutal-accent";
+      bgColor = "bg-brutal-accent";
     } else if (passedChecks >= 3) {
-      strength = "medium";
-      color = "text-yellow-400";
-      bgColor = "bg-yellow-400";
+      strength = "MEDIUM";
+      color = "text-yellow-500";
+      bgColor = "bg-yellow-500";
     }
 
     return {
@@ -65,7 +60,7 @@ const SignUp = () => {
       color,
       bgColor,
       score: passedChecks,
-      isValid: passedChecks >= 4, // Require at least 4 criteria
+      isValid: passedChecks >= 4,
     };
   }, [formData.password]);
 
@@ -84,14 +79,14 @@ const SignUp = () => {
       console.log(res.data?.code);
       if (res.data?.code == "00") {
         navigate("/login");
-        toast.success("Signup Successful");
+        toast.success("Signed up");
       } else {
         toast.error("Invalid username or password");
       }
     },
     onError: (error) => {
       console.log("Error callback triggered:", error);
-      toast.error("Something went wrong. Please try again.");
+      toast.error("Error. Try again.");
       console.error(error);
     },
   });
@@ -103,7 +98,6 @@ const SignUp = () => {
       [name]: value,
     }));
 
-    // Show password help when user starts typing password
     if (name === "password" && value.length > 0 && !showPasswordHelp) {
       setShowPasswordHelp(true);
     }
@@ -112,9 +106,8 @@ const SignUp = () => {
   const handleSubmit = (e) => {
     e.preventDefault();
 
-    // Check password strength before submitting
     if (!passwordValidation.isValid) {
-      toast.error("Please create a stronger password following the guidelines");
+      toast.error("Password too weak");
       return;
     }
 
@@ -123,59 +116,53 @@ const SignUp = () => {
   };
 
   const PasswordStrengthIndicator = () => (
-    <div className="mt-2">
+    <div className="mt-4">
       {/* Strength Bar */}
-      <div className="flex space-x-1 mb-2">
+      <div className="flex gap-1 mb-3">
         {[1, 2, 3, 4, 5].map((level) => (
           <div
             key={level}
-            className={`h-1 flex-1 rounded-full transition-all duration-300 ${
+            className={`h-2 flex-1 border-2 border-black transition-all duration-300 ${
               level <= passwordValidation.score
                 ? passwordValidation.bgColor
-                : "bg-white/20"
+                : "bg-brutal-white"
             }`}
           />
         ))}
       </div>
 
       {/* Strength Label */}
-      <div className="flex items-center justify-between mb-3">
-        <span className={`text-sm font-medium ${passwordValidation.color}`}>
-          Password strength: {passwordValidation.strength}
+      <div className="flex items-center justify-between mb-4">
+        <span className={`text-xs font-mono font-bold uppercase ${passwordValidation.color}`}>
+          Strength: {passwordValidation.strength}
         </span>
         {passwordValidation.isValid && (
-          <Check className="w-4 h-4 text-green-400" />
+          <Check className="w-5 h-5 text-brutal-accent" strokeWidth={3} />
         )}
       </div>
 
       {/* Password Requirements */}
       {showPasswordHelp && (
-        <div className="bg-white/5 rounded-lg p-3 border border-white/10">
-          <p className="text-purple-200 text-sm font-medium mb-2 flex items-center">
-            <Lock className="w-4 h-4 mr-2" />
-            Password Requirements:
+        <div className="bg-brutal-white border-4 border-black p-4">
+          <p className="text-xs font-bold uppercase tracking-wide mb-3 flex items-center text-black">
+            <Lock className="w-4 h-4 mr-2" strokeWidth={3} />
+            Requirements
           </p>
-          <div className="space-y-1">
+          <div className="space-y-2">
             {[
-              { key: "length", text: "At least 8 characters long" },
-              { key: "uppercase", text: "One uppercase letter (A-Z)" },
-              { key: "lowercase", text: "One lowercase letter (a-z)" },
-              { key: "number", text: "One number (0-9)" },
-              { key: "special", text: "One special character (!@#$%^&*)" },
+              { key: "length", text: "8+ characters" },
+              { key: "uppercase", text: "Uppercase (A-Z)" },
+              { key: "lowercase", text: "Lowercase (a-z)" },
+              { key: "number", text: "Number (0-9)" },
+              { key: "special", text: "Special (!@#$%)" },
             ].map(({ key, text }) => (
-              <div key={key} className="flex items-center text-xs">
+              <div key={key} className="flex items-center font-mono text-sm">
                 {passwordValidation.checks[key] ? (
-                  <Check className="w-3 h-3 text-green-400 mr-2 flex-shrink-0" />
+                  <Check className="w-4 h-4 text-brutal-accent mr-2 flex-shrink-0" strokeWidth={3} />
                 ) : (
-                  <X className="w-3 h-3 text-red-400 mr-2 flex-shrink-0" />
+                  <X className="w-4 h-4 text-brutal-error mr-2 flex-shrink-0" strokeWidth={3} />
                 )}
-                <span
-                  className={`${
-                    passwordValidation.checks[key]
-                      ? "text-green-300"
-                      : "text-purple-300/80"
-                  }`}
-                >
+                <span className={passwordValidation.checks[key] ? "text-brutal-accent" : "text-brutal-disabled"}>
                   {text}
                 </span>
               </div>
@@ -187,246 +174,167 @@ const SignUp = () => {
   );
 
   return (
-    <div className="min-h-screen relative overflow-hidden bg-gradient-to-br from-purple-900 via-purple-800 to-indigo-900">
-      <div className="absolute inset-0 w-full h-full">
-        <div className="absolute top-10 left-10 w-96 h-96 bg-gradient-to-r from-purple-400 to-pink-400 rounded-full mix-blend-multiply filter blur-3xl opacity-20 animate-pulse"></div>
-        <div
-          className="absolute top-20 right-20 w-80 h-80 bg-gradient-to-r from-blue-400 to-purple-500 rounded-full mix-blend-multiply filter blur-3xl opacity-15 animate-pulse"
-          style={{ animationDelay: "2s" }}
-        ></div>
-        <div
-          className="absolute bottom-20 left-1/4 w-72 h-72 bg-gradient-to-r from-pink-400 to-purple-500 rounded-full mix-blend-multiply filter blur-3xl opacity-20 animate-pulse"
-          style={{ animationDelay: "4s" }}
-        ></div>
-        <div
-          className="absolute bottom-10 right-1/3 w-64 h-64 bg-gradient-to-r from-indigo-400 to-blue-500 rounded-full mix-blend-multiply filter blur-3xl opacity-15 animate-pulse"
-          style={{ animationDelay: "6s" }}
-        ></div>
+    <div className="min-h-screen bg-brutal-black flex items-center justify-center px-4 py-12">
+      {/* Background pattern */}
+      <div className="fixed inset-0 opacity-5 pointer-events-none">
+        <div className="absolute inset-0" style={{
+          backgroundImage: `repeating-linear-gradient(
+            0deg,
+            transparent,
+            transparent 50px,
+            #00ff41 50px,
+            #00ff41 51px
+          ),
+          repeating-linear-gradient(
+            90deg,
+            transparent,
+            transparent 50px,
+            #00ff41 50px,
+            #00ff41 51px
+          )`
+        }} />
       </div>
 
-      {/* Cocktail Elements */}
-      <div className="absolute inset-0 pointer-events-none">
-        {[...Array(12)].map((_, i) => (
-          <div
-            key={i}
-            className="absolute animate-bounce opacity-10"
-            style={{
-              left: `${Math.random() * 100}%`,
-              top: `${Math.random() * 100}%`,
-              animationDelay: `${Math.random() * 4}s`,
-              animationDuration: `${4 + Math.random() * 3}s`,
-            }}
-          >
-            {i % 4 === 0 ? (
-              <Wine className="w-4 h-4 text-purple-300" />
-            ) : i % 4 === 1 ? (
-              <Sparkles className="w-3 h-3 text-pink-300" />
-            ) : i % 4 === 2 ? (
-              <ChefHat className="w-4 h-4 text-blue-300" />
-            ) : (
-              <div className="w-2 h-2 bg-gradient-to-r from-purple-400 to-pink-400 rounded-full"></div>
-            )}
-          </div>
-        ))}
-      </div>
+      <div className="w-full max-w-md relative z-10">
+        {/* Header */}
+        <div className="mb-8">
+          <h1 className="font-display text-5xl sm:text-6xl font-black uppercase text-brutal-white leading-[0.9] mb-3">
+            Create<br/>Account
+          </h1>
+          <p className="font-mono text-brutal-accent text-sm uppercase tracking-wide">
+            Sign up to save recipes
+          </p>
+        </div>
 
-      <div className="relative z-10 min-h-screen flex items-center justify-center p-4">
-        <div className="w-full max-w-md">
-          <div className="relative backdrop-blur-xl bg-white/10 border border-white/20 rounded-3xl p-8 shadow-2xl">
-            <div className="text-center mb-8">
-              <div className="relative inline-flex items-center justify-center w-16 h-16 mb-6">
-                <div className="absolute inset-0 bg-gradient-to-r from-purple-500 to-pink-500 rounded-2xl shadow-lg"></div>
-                <div className="relative bg-gradient-to-r from-purple-600 to-pink-600 rounded-2xl p-3 shadow-inner">
-                  <div className="flex items-center justify-center">
-                    <Zap className="w-5 h-5 text-white mr-0.5" />
-                    <ChefHat className="w-5 h-5 text-white" />
-                  </div>
-                </div>
-
-                <div className="absolute -top-1 -right-1 w-2 h-2 bg-pink-400 rounded-full animate-ping"></div>
-                <div
-                  className="absolute -bottom-1 -left-1 w-1.5 h-1.5 bg-purple-400 rounded-full animate-ping"
-                  style={{ animationDelay: "1s" }}
-                ></div>
-              </div>
-
-              <h1 className="text-3xl font-bold mb-2 bg-gradient-to-r from-white to-purple-200 bg-clip-text text-transparent">
-                Cocktail Recipe Generator
-              </h1>
-              <p className="text-purple-200 text-base font-medium mb-1">
-                Join the Bar!
-              </p>
-              <p className="text-purple-300/80 text-sm">
-                Create your account to craft amazing cocktails with AI
-              </p>
+        {/* Form Card */}
+        <form 
+          onSubmit={handleSubmit} 
+          className="bg-brutal-white border-4 border-black p-6 sm:p-8 shadow-brutal-accent-lg"
+        >
+          {/* Username Field */}
+          <div className="mb-6">
+            <label className="block text-xs font-bold uppercase tracking-wide mb-2 text-black">
+              Username
+            </label>
+            <div className="relative">
+              <input
+                className="w-full border-4 border-black px-4 py-4 text-lg font-mono focus:outline-none focus:border-brutal-accent bg-white placeholder:text-brutal-disabled"
+                type="text"
+                name="username"
+                required
+                value={formData.username}
+                onChange={handleChange}
+                placeholder="Username"
+              />
+              <User className="absolute right-4 top-1/2 -translate-y-1/2 w-5 h-5 text-brutal-disabled" strokeWidth={2.5} />
             </div>
+          </div>
 
-            <form onSubmit={handleSubmit} className="space-y-6">
-              <div>
-                <label className="block text-sm font-medium text-purple-200 mb-2">
-                  Username
-                </label>
-                <div className="relative">
-                  <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
-                    <User className="h-5 w-5 text-purple-400" />
-                  </div>
-                  <input
-                    className="w-full pl-12 pr-4 py-3 bg-white/10 backdrop-blur border border-white/20 rounded-xl text-white placeholder-purple-300/60
-                             focus:ring-2 focus:ring-purple-400/50 focus:border-purple-400/50 focus:bg-white/15
-                             transition-all duration-200 hover:bg-white/12"
-                    type="text"
-                    name="username"
-                    required
-                    value={formData.username}
-                    onChange={handleChange}
-                    placeholder="Choose your mixologist name"
-                  />
-                </div>
-              </div>
+          {/* Email Field */}
+          <div className="mb-6">
+            <label className="block text-xs font-bold uppercase tracking-wide mb-2 text-black">
+              Email
+            </label>
+            <div className="relative">
+              <input
+                className="w-full border-4 border-black px-4 py-4 text-lg font-mono focus:outline-none focus:border-brutal-accent bg-white placeholder:text-brutal-disabled"
+                type="email"
+                name="email"
+                required
+                value={formData.email}
+                onChange={handleChange}
+                placeholder="your@email.com"
+              />
+              <Mail className="absolute right-4 top-1/2 -translate-y-1/2 w-5 h-5 text-brutal-disabled" strokeWidth={2.5} />
+            </div>
+          </div>
 
-              <div>
-                <label className="block text-sm font-medium text-purple-200 mb-2">
-                  Email
-                </label>
-                <div className="relative">
-                  <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
-                    <Mail className="h-5 w-5 text-purple-400" />
-                  </div>
-                  <input
-                    className="w-full pl-12 pr-4 py-3 bg-white/10 backdrop-blur border border-white/20 rounded-xl text-white placeholder-purple-300/60
-                             focus:ring-2 focus:ring-purple-400/50 focus:border-purple-400/50 focus:bg-white/15
-                             transition-all duration-200 hover:bg-white/12"
-                    type="email"
-                    name="email"
-                    required
-                    value={formData.email}
-                    onChange={handleChange}
-                    placeholder="Enter your email address"
-                  />
-                </div>
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium text-purple-200 mb-2">
-                  Password
-                </label>
-                <div className="relative">
-                  <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
-                    <Lock className="h-5 w-5 text-purple-400" />
-                  </div>
-                  <input
-                    className={`w-full pl-12 pr-12 py-3 bg-white/10 backdrop-blur border rounded-xl text-white placeholder-purple-300/60
-                             focus:ring-2 focus:ring-purple-400/50 focus:border-purple-400/50 focus:bg-white/15
-                             transition-all duration-200 hover:bg-white/12 ${
-                               formData.password && !passwordValidation.isValid
-                                 ? "border-red-400/50"
-                                 : formData.password &&
-                                   passwordValidation.isValid
-                                 ? "border-green-400/50"
-                                 : "border-white/20"
-                             }`}
-                    type={showPassword ? "text" : "password"}
-                    name="password"
-                    required
-                    value={formData.password}
-                    onChange={handleChange}
-                    placeholder="Create your password"
-                  />
-                  <button
-                    type="button"
-                    className="absolute inset-y-0 right-0 pr-4 flex items-center"
-                    onClick={() => setShowPassword(!showPassword)}
-                  >
-                    {showPassword ? (
-                      <EyeOff className="h-5 w-5 text-purple-400 hover:text-purple-300 transition-colors" />
-                    ) : (
-                      <Eye className="h-5 w-5 text-purple-400 hover:text-purple-300 transition-colors" />
-                    )}
-                  </button>
-                </div>
-
-                {/* Password Strength Indicator */}
-                {formData.password && <PasswordStrengthIndicator />}
-              </div>
-
+          {/* Password Field */}
+          <div className="mb-6">
+            <label className="block text-xs font-bold uppercase tracking-wide mb-2 text-black">
+              Password
+            </label>
+            <div className="relative">
+              <input
+                className={`w-full border-4 px-4 py-4 text-lg font-mono focus:outline-none bg-white placeholder:text-brutal-disabled pr-12 ${
+                  formData.password && !passwordValidation.isValid
+                    ? "border-brutal-error"
+                    : formData.password && passwordValidation.isValid
+                    ? "border-brutal-accent"
+                    : "border-black focus:border-brutal-accent"
+                }`}
+                type={showPassword ? "text" : "password"}
+                name="password"
+                required
+                value={formData.password}
+                onChange={handleChange}
+                placeholder="Create password"
+              />
               <button
-                type="submit"
-                disabled={
-                  signUpMutation.isPending ||
-                  (formData.password && !passwordValidation.isValid)
-                }
-                className="w-full py-3 px-6 bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 
-                         text-white font-semibold rounded-xl shadow-lg
-                         focus:outline-none focus:ring-2 focus:ring-purple-400/50
-                         transition-all duration-200 transform hover:scale-105
-                         disabled:opacity-60 disabled:cursor-not-allowed disabled:transform-none
-                         flex items-center justify-center space-x-2"
+                type="button"
+                className="absolute right-4 top-1/2 -translate-y-1/2 text-brutal-disabled hover:text-black transition-colors"
+                onClick={() => setShowPassword(!showPassword)}
               >
-                {signUpMutation.isPending ? (
-                  <>
-                    <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin" />
-                    <span>Joining the Bar...</span>
-                  </>
+                {showPassword ? (
+                  <EyeOff className="w-5 h-5" strokeWidth={2.5} />
                 ) : (
-                  <>
-                    <Zap className="w-5 h-5" />
-                    <span>Join the Cocktail Masters</span>
-                    <ChefHat className="w-5 h-5" />
-                  </>
+                  <Eye className="w-5 h-5" strokeWidth={2.5} />
                 )}
               </button>
-
-              {/* Password warning if weak */}
-              {formData.password && !passwordValidation.isValid && (
-                <div className="flex items-center space-x-2 text-red-400 text-sm bg-red-400/10 rounded-lg p-3 border border-red-400/20">
-                  <AlertCircle className="w-4 h-4 flex-shrink-0" />
-                  <span>
-                    Please create a stronger password to secure your account
-                  </span>
-                </div>
-              )}
-            </form>
-
-            <div className="mt-8 text-center">
-              <p className="text-purple-300/80 text-sm">
-                Already a master mixologist?{" "}
-                <a
-                  href="/login"
-                  className="text-purple-300 hover:text-purple-200 font-medium transition-colors hover:underline"
-                >
-                  Sign in to your bar
-                </a>
-              </p>
             </div>
 
-            <div className="mt-6 bg-white/5 rounded-2xl p-4 border border-white/10">
-              <p className="text-purple-200 text-sm font-medium mb-3 text-center">
-                ✨ What you'll get as a member:
-              </p>
-              <div className="flex justify-center space-x-6 text-xs text-purple-300/80">
-                <span className="flex items-center space-x-1">
-                  <Zap className="w-3 h-3" />
-                  <span>AI-Powered</span>
-                </span>
-                <span className="flex items-center space-x-1">
-                  <Wine className="w-3 h-3" />
-                  <span>Premium Recipes</span>
-                </span>
-                <span className="flex items-center space-x-1">
-                  <Star className="w-3 h-3" />
-                  <span>Easy to Use</span>
+            {/* Password Strength Indicator */}
+            {formData.password && <PasswordStrengthIndicator />}
+          </div>
+
+          {/* Error Message */}
+          {formData.password && !passwordValidation.isValid && (
+            <div className="mb-6 bg-brutal-error/10 border-l-4 border-brutal-error px-4 py-3">
+              <div className="flex items-center">
+                <AlertCircle className="w-5 h-5 text-brutal-error mr-2 flex-shrink-0" strokeWidth={2.5} />
+                <span className="font-mono text-sm text-brutal-error">
+                  Stronger password required
                 </span>
               </div>
             </div>
+          )}
 
-            <div className="absolute inset-0 rounded-3xl bg-gradient-to-tr from-white/10 via-transparent to-transparent pointer-events-none"></div>
-          </div>
+          {/* Submit Button */}
+          <button
+            type="submit"
+            disabled={signUpMutation.isPending || (formData.password && !passwordValidation.isValid)}
+            className="w-full bg-black text-brutal-accent py-4 px-8 text-xl font-display font-black uppercase border-4 border-black hover:bg-brutal-accent hover:text-black transition-colors duration-150 shadow-brutal-accent disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:bg-black disabled:hover:text-brutal-accent flex items-center justify-center gap-3"
+          >
+            {signUpMutation.isPending ? (
+              <>
+                <div className="w-6 h-6 border-4 border-brutal-accent border-t-transparent animate-spin" />
+                <span>Creating...</span>
+              </>
+            ) : (
+              <>
+                <span>Sign Up</span>
+                <ArrowRight className="w-6 h-6" strokeWidth={3} />
+              </>
+            )}
+          </button>
 
-          <div className="text-center mt-6">
-            <p className="text-purple-400/60 text-sm font-medium">
-              "Where AI meets the art of mixology" 🍹✨
-            </p>
-          </div>
+          {/* Login Link */}
+          <p className="text-center mt-6 text-sm font-mono text-brutal-disabled">
+            Already have an account?{" "}
+            <a 
+              href="/login" 
+              className="font-bold text-black underline decoration-2 underline-offset-2 hover:text-brutal-accent transition-colors"
+            >
+              Log In
+            </a>
+          </p>
+        </form>
+
+        {/* Footer */}
+        <div className="mt-8 text-center">
+          <p className="font-mono text-xs text-brutal-disabled uppercase tracking-wide">
+            Cocktail Generator
+          </p>
         </div>
       </div>
     </div>

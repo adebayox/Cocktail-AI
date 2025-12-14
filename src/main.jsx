@@ -1,21 +1,33 @@
 import { StrictMode } from "react";
 import { createRoot } from "react-dom/client";
-import ReactDom from "react-dom/client";
 import {
   createBrowserRouter,
   RouterProvider,
-  Navigate,
-  Outlet,
 } from "react-router-dom";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { ToastContainer } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 import "./index.css";
 import SignUp from "./pages/SignUp";
 import Login from "./pages/Login";
 import HomePage from "./pages/HomePage";
-
 import SharedRecipe from "./pages/SharedRecipe";
+import InstallPrompt from "./components/InstallPrompt";
+
+// Register service worker
+if ("serviceWorker" in navigator) {
+  window.addEventListener("load", () => {
+    navigator.serviceWorker
+      .register("/sw.js")
+      .then((registration) => {
+        console.log("SW registered:", registration.scope);
+      })
+      .catch((error) => {
+        console.log("SW registration failed:", error);
+      });
+  });
+}
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -51,7 +63,19 @@ createRoot(document.getElementById("root")).render(
   <StrictMode>
     <QueryClientProvider client={queryClient}>
       <RouterProvider router={router} />
-      <ToastContainer />
+      <ToastContainer 
+        position="top-right"
+        autoClose={3000}
+        hideProgressBar={false}
+        newestOnTop
+        closeOnClick
+        rtl={false}
+        pauseOnFocusLoss={false}
+        draggable={false}
+        pauseOnHover
+        limit={3}
+      />
+      <InstallPrompt />
     </QueryClientProvider>
   </StrictMode>
 );

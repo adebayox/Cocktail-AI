@@ -31,7 +31,7 @@ export const useCollections = () => {
         },
       }),
     onSuccess: (response) => {
-      toast.success("Collection created successfully!");
+      toast.success("Collection created");
       queryClient.invalidateQueries({ queryKey: ["collections"] });
       return response.data.collection;
     },
@@ -61,7 +61,7 @@ export const useCollections = () => {
     },
     onSuccess: (res) => {
       if (res.data?.code === "00") {
-        toast.success("Added to collection!");
+        toast.success("Added to collection");
         queryClient.invalidateQueries({ queryKey: ["collections"] });
         return res.data;
       }
@@ -77,11 +77,11 @@ export const useCollections = () => {
         url: `cocktail/collection/${collectionId}`,
       }),
     onSuccess: () => {
-      toast.success("Collection deleted successfully!");
+      toast.success("Collection deleted");
       queryClient.invalidateQueries({ queryKey: ["collections"] }); // Refresh the collections list
     },
     onError: (error) => {
-      toast.error("Failed to delete collection. Please try again.");
+      toast.error("Delete failed");
       console.error("Delete collection error:", error);
     },
   });

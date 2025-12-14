@@ -1,5 +1,5 @@
 import React from "react";
-import { Plus, Loader2, Trash2 } from "lucide-react";
+import { Plus, Trash2 } from "lucide-react";
 
 const CollectionsView = ({
   collections,
@@ -10,37 +10,44 @@ const CollectionsView = ({
 }) => {
   if (isLoading) {
     return (
-      <div className="max-w-6xl mx-auto flex justify-center items-center py-20">
-        <Loader2 className="w-10 h-10 text-purple-600 animate-spin" />
+      <div className="flex items-center justify-center py-20">
+        <div className="text-center">
+          <div className="w-12 h-12 border-4 border-brutal-accent border-t-transparent animate-spin mb-4 mx-auto" />
+          <p className="font-mono text-sm text-brutal-disabled uppercase">
+            Loading collections...
+          </p>
+        </div>
       </div>
     );
   }
 
   return (
-    <div className="max-w-6xl mx-auto">
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        {collections?.map((collection) => (
-          <div
-            key={collection._id}
-            className="bg-white rounded-xl shadow-md hover:shadow-lg transition-shadow cursor-pointer overflow-hidden relative" // Added relative for positioning
+    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+      {collections?.map((collection) => (
+        <div
+          key={collection._id}
+          className="bg-brutal-white border-4 border-black shadow-brutal hover:shadow-brutal-accent hover:translate-x-[-2px] hover:translate-y-[-2px] transition-all relative"
+        >
+          {/* Delete Button */}
+          <button
+            onClick={(e) => {
+              e.stopPropagation();
+              onDeleteCollection(collection._id);
+            }}
+            className="absolute top-3 right-3 z-10 p-2 bg-brutal-error text-white border-2 border-black hover:bg-black hover:text-brutal-error transition-colors"
           >
-            <button
-              onClick={(e) => {
-                e.stopPropagation();
-                onDeleteCollection(collection._id);
-              }}
-              className="absolute top-2 right-2 p-2 bg-red-100 rounded-full text-red-600 hover:bg-red-200 hover:text-red-700 transition-colors"
-            >
-              <Trash2 className="w-5 h-5" />
-            </button>
+            <Trash2 className="w-4 h-4" strokeWidth={2.5} />
+          </button>
 
-            <div
-              onClick={() => onSelectCollection(collection)}
-              className="grid grid-cols-2 gap-1 h-40"
-            >
+          {/* Collection Preview Images */}
+          <div
+            onClick={() => onSelectCollection(collection)}
+            className="cursor-pointer"
+          >
+            <div className="grid grid-cols-2 gap-1 h-40 border-b-4 border-black">
               {collection.cocktails && collection.cocktails.length > 0 ? (
                 collection.cocktails.slice(0, 4).map((cocktail, index) => (
-                  <div key={index} className="h-20 overflow-hidden">
+                  <div key={index} className="h-20 overflow-hidden bg-black">
                     {cocktail.imageUrl ? (
                       <img
                         src={cocktail.imageUrl}
@@ -48,8 +55,8 @@ const CollectionsView = ({
                         className="w-full h-full object-cover"
                       />
                     ) : (
-                      <div className="w-full h-full bg-gradient-to-r from-purple-100 to-pink-100 flex items-center justify-center">
-                        <span className="text-xs text-purple-500 font-medium truncate px-2">
+                      <div className="w-full h-full flex items-center justify-center">
+                        <span className="font-mono text-xs text-brutal-accent uppercase px-2 text-center">
                           {cocktail.name}
                         </span>
                       </div>
@@ -57,8 +64,8 @@ const CollectionsView = ({
                   </div>
                 ))
               ) : (
-                <div className="col-span-2 h-40 bg-gradient-to-r from-purple-100 to-pink-100 flex items-center justify-center">
-                  <span className="text-purple-500 font-medium">
+                <div className="col-span-2 h-40 bg-black/5 flex items-center justify-center">
+                  <span className="font-mono text-sm text-brutal-disabled uppercase">
                     Empty Collection
                   </span>
                 </div>
@@ -66,25 +73,28 @@ const CollectionsView = ({
             </div>
 
             <div className="p-4">
-              <h3 className="text-xl font-semibold text-purple-800">
+              <h3 className="font-display font-bold uppercase text-black text-xl mb-1">
                 {collection.name}
               </h3>
-              <p className="text-sm text-purple-600 mt-1">
+              <p className="font-mono text-xs text-brutal-disabled uppercase">
                 {collection.cocktails?.length || 0} cocktails
               </p>
             </div>
           </div>
-        ))}
-
-        <div
-          onClick={onCreateNew}
-          className="bg-white rounded-xl shadow-md hover:shadow-lg transition-shadow cursor-pointer border-2 border-dashed border-purple-200 flex flex-col items-center justify-center h-64"
-        >
-          <Plus className="w-12 h-12 text-purple-400 mb-2" />
-          <p className="text-lg font-medium text-purple-600">
-            Create New Collection
-          </p>
         </div>
+      ))}
+
+      {/* Create New Collection Card */}
+      <div
+        onClick={onCreateNew}
+        className="border-4 border-dashed border-black flex flex-col items-center justify-center h-64 cursor-pointer hover:border-brutal-accent hover:bg-brutal-accent/5 transition-all group"
+      >
+        <div className="w-16 h-16 bg-black flex items-center justify-center mb-4 group-hover:bg-brutal-accent transition-colors">
+          <Plus className="w-8 h-8 text-brutal-accent group-hover:text-black transition-colors" strokeWidth={2.5} />
+        </div>
+        <p className="font-display font-bold uppercase text-black text-lg">
+          New Collection
+        </p>
       </div>
     </div>
   );
